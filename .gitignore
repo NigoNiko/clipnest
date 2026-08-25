@@ -1,0 +1,4 @@
+outputs/clipnest-tauri-demo/node_modules/
+outputs/clipnest-tauri-demo/src-tauri/target/
+*.log
+
