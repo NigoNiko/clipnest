@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet('1.20', '1.21', '1.22')]
+    [ValidateSet('1.20', '1.21', '1.22', '1.23')]
     [string] $Version
 )
 
@@ -38,8 +38,9 @@ $inno = Start-Process -FilePath $innoInstaller -ArgumentList @('/SP-', '/VERYSIL
 if ($inno.ExitCode -ne 0) { throw "Inno Setup bootstrap failed: $($inno.ExitCode)" }
 
 $template = Get-Content (Join-Path $desktopRoot 'installer\ClipNest.iss') -Raw
-$template = $template.Replace('#define AppVersion "1.22"', "#define AppVersion `"$Version`"")
-$template = $template.Replace('#define BuildDir "..\..\work\dist-v122\ClipNest"', "#define BuildDir `"$(Join-Path $distRoot 'ClipNest')`"")
+$template = $template.Replace('#define AppVersion "1.23"', "#define AppVersion `"$Version`"")
+$template = $template.Replace('#define BuildDir "..\..\work\dist-v123\ClipNest"', "#define BuildDir `"$(Join-Path $distRoot 'ClipNest')`"")
+$template = $template.Replace('VersionInfoVersion=1.23.0.0', "VersionInfoVersion=$Version.0.0")
 $template = $template.Replace('SetupIconFile=ClipNest.ico', "SetupIconFile=$(Join-Path $sourceDir 'ClipNest.ico')")
 $template = $template.Replace('OutputDir=..', "OutputDir=$outputRoot")
 if ($Version -eq '1.21') {
