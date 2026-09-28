@@ -1,0 +1,43 @@
+name: Release ClipNest desktop
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Build and publish versions 1.20 through 1.22
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          foreach ($version in @('1.20', '1.21', '1.22')) {
+            & ./desktop/build-release.ps1 -Version $version
+            if ($LASTEXITCODE -ne 0) { throw "Build $version failed." }
+
+            if ($version -eq '1.20') {
+              $asset = "release-output/ClipNest-$version-Windows.zip"
+            } else {
+              $asset = "release-output/ClipNest-$version-Setup-x64.exe"
+            }
+            if (-not (Test-Path $asset)) { throw "Missing asset $asset" }
+
+            $latest = if ($version -eq '1.22') { '--latest' } else { '--latest=false' }
+            gh release create "v$version" $asset --repo $env:GITHUB_REPOSITORY --title "ClipNest Version $version" --notes-file "desktop/release-notes/$version.md" $latest
+            if ($LASTEXITCODE -ne 0) { throw "Publishing $version failed." }
+          }
+
