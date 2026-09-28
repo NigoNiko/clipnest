@@ -1,9 +1,7 @@
-name: Build ClipNest for Windows
+name: Build ClipNest for Windows (legacy Tauri)
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main, master]
 
 permissions:
   contents: read
@@ -42,4 +40,3 @@ jobs:
             outputs/clipnest-tauri-demo/src-tauri/target/release/bundle/nsis/*.exe
             outputs/clipnest-tauri-demo/src-tauri/target/release/bundle/msi/*.msi
           if-no-files-found: error
-
