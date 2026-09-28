@@ -1,10 +1,55 @@
-# ClipNest desktop releases
+# ClipNest 1.23 for Windows
 
-This private repository contains the Windows ClipNest desktop source snapshots starting with Version 1.20. Version numbers use two digits after the decimal point: 1.20, 1.21, and so on through 1.99, followed by 2.00.
+版本号按百进制递增：1.20、1.21……1.99、2.00；仅在用户明确指定时跳号。设置页“关于”分类显示为“Version 1.23”，后续版本沿用“Version X.XX”格式。
 
-The `versions` directory keeps the source and PyInstaller spec used for each release. `build-release.ps1` builds a Windows artifact with Python 3.12, PySide6 6.9.2, and PyInstaller 6.16.0. Version 1.20 is a portable ZIP; Version 1.21 and later use an Inno Setup installer with one stable application identity and installation directory.
+ClipNest 是一个本地剪贴板工具。运行 `ClipNest.exe` 后，它会留在系统托盘中；默认按 **Ctrl + Alt + Q** 打开底部卡片栏，可在设置里修改。
 
-The release workflow publishes the artifacts as private GitHub Releases. The app checks the latest published Release through the GitHub REST API. A private repository requires a user's own read-only token; after the repository and Releases become public, updates work anonymously. Never add a personal token to source code, workflow files, or an installer.
+## 使用
 
-Clipboard history and settings remain on the user's machine under `%LOCALAPPDATA%\ClipNest` unless the user selected a different database folder in Settings.
+- 复制文字、链接、代码、六位十六进制颜色、图片或文件，即可自动加入历史记录。
+- 左键单击卡片可粘贴到先前的应用；在设置里关闭“直接粘贴”后，单击只会复制到剪贴板。
+- 右键卡片或预览内容可选择保留格式粘贴、无格式粘贴、编辑文字、重命名、添加到收藏板、复制或删除。
+- 用顶部搜索框和类型筛选查找内容。按 Ctrl + 1～9 可快速使用当前列表的前九项；按住 Shift 可用纯文本粘贴。
+- 打开卡片栏会选中当前列表的第一项；用左右方向键切换，按 Ctrl + F 再进入搜索框。
+- 卡片固定高度，不产生垂直滚动。横向滚动条隐藏；可用鼠标滚轮或触控板水平滑动。左右方向键始终优先切换剪贴项目。
+- 窗口带柔和阴影；卡片菜单和系统托盘右键菜单均采用圆角。顶部按钮用绿色表示“正在记录”，黄色表示“已暂停记录”，点击可切换状态。
+- 搜索默认显示为圆形放大镜，同一个控件会展开为圆角搜索框；点击放大镜或窗口内搜索栏以外的位置会清除筛选并收起。在搜索栏内点击文字仍可继续编辑。顶部控件依次是搜索、固定、分类、记录状态和设置。类型按钮的文字避开右侧箭头，视觉居中。
+- 顶部图钉可固定窗口：点击其他应用时窗口继续显示，选择剪贴项目后也保持打开；再次点击图钉或主动关闭窗口可取消固定。
+- 在收藏板中可拖动卡片调整顺序，位置会保存到数据库；搜索或分类筛选期间暂不拖动排序。
+- 卡片栏底部不显示操作提示；完整操作与快捷键说明在“设置”页面。
+- Ctrl + Shift + C 可暂停或恢复记录。托盘菜单也有相同操作。
+- 卡片栏从任务栏下方滑出；点击窗口外、按 Esc 或再次按呼出快捷键会滑回并收起。
+- 设置页分为“外观与操作”“记录与隐私”“数据与备份”“快捷键说明”四类，并记住上次打开的分类。顶部说明文字右侧显示当前版本号。勾选项整行可点击，勾选标记按当前主题色清楚显示，保存失败会恢复原状态并提示原因。原有的主题色、保留时间、保存位置、呼出快捷键、忽略应用、直接粘贴、开机启动、备份和清空历史功能均保留。主题色会影响选中框和主要按钮；蓝色应用图标保持统一。收藏板内容不会因历史保留时间到期而删除。缩短保留期限时，会先显示即将删除的记录数并征求确认。
+- 开机启动在当前用户登录 Windows 后让 ClipNest 驻留托盘，不主动弹出卡片栏；随时可在设置中关闭。移动程序文件夹后，请在设置中重新开启此选项，以更新启动路径。
+- 来源程序显示为微信、Chrome 浏览器、Edge 浏览器等名称。复制 Office 表格时会尽量保留剪贴板中的 HTML 与 Windows 原生格式；实际粘贴效果取决于目标程序支持的格式。
+- 文件卡片对 Excel、Word、PowerPoint、PDF、文本、压缩包和图片文件显示铺满预览区域的格式图标，文件名保留在卡片底部。预览区不再套一层紫色边框。代码卡片采用黑白配色。
+- 链接卡片优先显示手动命名，其次显示公开网页标题、剪贴板自带的链接文字和网站名称；图标优先使用网站声明的 favicon，也会尝试 Apple Touch 图标和站点根目录图标，失败时显示本地标识。支持最多三次短链接跳转、手动重新获取预览，也可在右键菜单恢复自动网页标题；能处理部分网站不规范的字符编码。登录、动态页面或拒绝抓取的页面可能只显示网站名称。原始网址保持不变。
+
+## 数据与隐私
+
+默认保存在 `%LOCALAPPDATA%\ClipNest\clipnest.db`。在设置中可查看并迁移数据库。迁移会先备份并校验新文件，成功后删除旧数据库；路径配置保留在 `%LOCALAPPDATA%\ClipNest\config.json`。历史记录不会同步。自动获取网页标题和图标默认开启，会直接访问复制链接及网页声明的图标地址，不使用第三方截图服务；可在设置中关闭。成功预览缓存七天，失败缓存一天。程序默认跳过常见密码管理器进程，以及声明不应进入剪贴板历史的内容。部分浏览器扩展可能无法标识密码内容；可在设置中将其所在的浏览器加入忽略列表，或使用“暂停记录”。
+
+## 1.20 性能更新
+
+- 水平列表只创建屏幕可见及附近的卡片，滚动、键盘选择和收藏板拖动仍可访问列表中的其他项目；切换收藏板时不再重建数百张卡片。
+- 更换主题色时更新现有控件样式，不重新查询和创建剪贴卡片。短文本预览只读取所需部分，复制和粘贴仍从数据库读取完整内容；网页图标与图片数据只在卡片需要显示时读取。
+- 安装包移除了当前界面不使用的 Qt PDF 渲染和虚拟键盘模块。原有文件类型图标、图片预览与链接预览继续保留。
+
+## 安装与升级
+
+运行 `ClipNest-1.23-Setup-x64.exe` 即可安装。默认位置是 `%LOCALAPPDATA%\Programs\ClipNest`，不需要管理员权限。安装过程会创建开始菜单快捷方式，并可选择创建桌面快捷方式；Windows 的“已安装的应用”中可以卸载。卸载不会删除 `%LOCALAPPDATA%\ClipNest` 中的历史记录和设置，也不会删除在设置中迁移到其他位置的数据库。
+
+首次从 1.20 及更早的便携版切换时，先从旧版托盘菜单选择“退出”，再运行安装程序。数据会自动沿用。旧便携版文件夹不会被安装程序擅自删除，可确认新版正常工作后自行删除。若旧版已开启开机启动，安装程序会将该启动项指向新位置。
+
+以后升级只需运行新版安装程序。安装程序会先让已安装版正常退出，再在同一位置覆盖升级；完成后可以立即启动。无需手动解压或移动文件。历史记录和设置与安装目录分开保存。
+
+## GitHub 更新
+
+设置页新增“关于”，显示版本号、检查更新按钮和 GitHub 页面按钮。点击检查更新后，程序读取 `NigoNiko/clipnest` 的最新 GitHub Release；有新版本时显示发布说明，并可忽略本次更新或立即更新。更新文件来自该 Release 的 Windows x64 安装包，下载后校验 GitHub 提供的 SHA-256 值，再运行安装程序更新原位置。临时安装包保存在 `%LOCALAPPDATA%\ClipNest\updates`，启动后自动清理；卸载时也会清理。
+
+私有仓库阶段，每位有权限的用户需要在“关于”页输入自己的 GitHub fine-grained personal access token，限定 `NigoNiko/clipnest` 仓库，授予 Contents（只读）。令牌使用 Windows 当前用户的 DPAPI 加密保存在 `%LOCALAPPDATA%\ClipNest\github-token.dat`，不会写入安装包。仓库和 Release 公开后，检查和下载更新无需令牌；程序会优先匿名访问。卸载会移除已保存的令牌。
+
+如需从源码构建，先用 `ClipNest.spec` 打包，再用 `ClipNest.iss` 和 Inno Setup 7 编译安装程序。`ClipNest.exe` 与 `_internal` 必须保持在同一文件夹中。
+
+源代码在 `clipnest.py`，使用 Python 3.12 与 PySide6。程序只有本地依赖，未使用 Paste 的品牌、图标或素材。
 
