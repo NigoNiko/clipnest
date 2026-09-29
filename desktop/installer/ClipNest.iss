@@ -1,6 +1,6 @@
 #define AppName "ClipNest"
-#define AppVersion "1.24"
-#define BuildDir "..\..\work\dist-v124\ClipNest"
+#define AppVersion "1.26"
+#define BuildDir "..\..\work\dist-v126\ClipNest"
 
 [Setup]
 AppId={{0ED42FB7-3A2F-43B3-B063-BACD9F672671}
@@ -26,7 +26,7 @@ WizardStyle=modern
 CloseApplications=yes
 RestartApplications=no
 ShowLanguageDialog=no
-VersionInfoVersion=1.24.0.0
+VersionInfoVersion=1.26.0.0
 VersionInfoDescription=ClipNest installer
 
 [Languages]
@@ -34,6 +34,23 @@ Name: "chinesesimplified"; MessagesFile: "compiler:Languages\ChineseSimplified.i
 
 [Tasks]
 Name: "desktopicon"; Description: "创建桌面快捷方式"; GroupDescription: "附加任务："; Flags: unchecked
+
+[InstallDelete]
+; Remove only identified program files from the old portable bundle.
+Type: filesandordirs; Name: "{app}\ClipNest-1.20-Windows\ClipNest-1.20\_internal"
+Type: files; Name: "{app}\ClipNest-1.20-Windows\ClipNest-1.20\ClipNest.exe"
+Type: files; Name: "{app}\ClipNest-1.20-Windows\ClipNest-1.20\ClipNest-icon.png"
+Type: files; Name: "{app}\ClipNest-1.20-Windows\ClipNest-1.20\ClipNest.ico"
+Type: files; Name: "{app}\ClipNest-1.20-Windows\ClipNest-1.20\clipnest.py"
+Type: files; Name: "{app}\ClipNest-1.20-Windows\ClipNest-1.20\ClipNest.spec"
+Type: files; Name: "{app}\ClipNest-1.20-Windows\ClipNest-1.20\README.md"
+Type: dirifempty; Name: "{app}\ClipNest-1.20-Windows\ClipNest-1.20"
+Type: dirifempty; Name: "{app}\ClipNest-1.20-Windows"
+; A previous build duplicated Qt DLLs in PySide6 and the runtime root.
+Type: files; Name: "{app}\_internal\PySide6\*.dll"
+Type: files; Name: "{app}\_internal\shiboken6\*.dll"
+Type: files; Name: "{app}\_internal\libcrypto-3.dll"
+Type: files; Name: "{app}\_internal\libssl-3.dll"
 
 [Files]
 Source: "{#BuildDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -94,4 +111,3 @@ begin
   if Pos(InstalledExe, Lowercase(OldValue)) > 0 then
     RegDeleteValue(HKCU, StartupKey, StartupName);
 end;
-

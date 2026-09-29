@@ -19,17 +19,16 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Build and publish Version 1.24
+      - name: Build and publish Version 1.26
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           $ErrorActionPreference = 'Stop'
-          $version = '1.24'
+          $version = '1.26'
           & ./desktop/build-release.ps1 -Version $version
           if ($LASTEXITCODE -ne 0) { throw "Build $version failed." }
           $asset = "release-output/ClipNest-$version-Setup-x64.exe"
           if (-not (Test-Path $asset)) { throw "Missing asset $asset" }
           gh release create "v$version" $asset --repo $env:GITHUB_REPOSITORY --title "ClipNest Version $version" --notes-file "desktop/release-notes/$version.md" --latest
           if ($LASTEXITCODE -ne 0) { throw "Publishing $version failed." }
-
