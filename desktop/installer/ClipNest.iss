@@ -8,7 +8,7 @@ AppName={#AppName}
 AppVersion={#AppVersion}
 AppVerName=ClipNest {#AppVersion}
 AppPublisher=ClipNest
-DefaultDirName={%LOCALAPPDATA}\Programs\ClipNest
+DefaultDirName={code:InstallDirectory}
 DefaultGroupName=ClipNest
 UsePreviousAppDir=yes
 DisableDirPage=no
@@ -77,6 +77,32 @@ const
 
 var
   RemoveUserData: Boolean;
+
+function InstallDirectory(Param: String): String;
+var
+  StartupValue: String;
+  ExePath: String;
+  ClosingQuote: Integer;
+  SwitchPosition: Integer;
+begin
+  Result := ExpandConstant('{%LOCALAPPDATA}\Programs\ClipNest');
+  if not RegQueryStringValue(HKCU, StartupKey, StartupName, StartupValue) then Exit;
+  StartupValue := Trim(StartupValue);
+  if (Pos('clipnest.exe', Lowercase(StartupValue)) = 0) or
+    (Pos('--background', Lowercase(StartupValue)) = 0) then Exit;
+  if Copy(StartupValue, 1, 1) = '"' then begin
+    ClosingQuote := Pos('"', Copy(StartupValue, 2, Length(StartupValue) - 1));
+    if ClosingQuote = 0 then Exit;
+    ExePath := Copy(StartupValue, 2, ClosingQuote - 1);
+  end else begin
+    SwitchPosition := Pos(' --background', Lowercase(StartupValue));
+    if SwitchPosition = 0 then Exit;
+    ExePath := Copy(StartupValue, 1, SwitchPosition - 1);
+  end;
+  if (CompareText(ExtractFileName(ExePath), 'ClipNest.exe') = 0) and
+    FileExists(ExePath) then
+    Result := ExtractFileDir(ExePath);
+end;
 
 function InitializeUninstall: Boolean;
 var
