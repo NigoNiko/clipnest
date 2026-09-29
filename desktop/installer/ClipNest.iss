@@ -1,6 +1,6 @@
 #define AppName "ClipNest"
-#define AppVersion "1.26"
-#define BuildDir "..\..\work\dist-v126\ClipNest"
+#define AppVersion "1.27"
+#define BuildDir "..\..\work\dist-v127\ClipNest"
 
 [Setup]
 AppId={{0ED42FB7-3A2F-43B3-B063-BACD9F672671}
@@ -17,6 +17,8 @@ SetupArchitecture=x64
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 UninstallDisplayIcon={app}\ClipNest.exe
+Uninstallable=yes
+CreateUninstallRegKey=yes
 SetupIconFile=ClipNest.ico
 OutputDir=..
 OutputBaseFilename=ClipNest-{#AppVersion}-Setup-x64
@@ -26,7 +28,7 @@ WizardStyle=modern
 CloseApplications=yes
 RestartApplications=no
 ShowLanguageDialog=no
-VersionInfoVersion=1.26.0.0
+VersionInfoVersion=1.27.0.0
 VersionInfoDescription=ClipNest installer
 
 [Languages]
@@ -57,6 +59,7 @@ Source: "{#BuildDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs c
 
 [Icons]
 Name: "{autoprograms}\ClipNest"; Filename: "{app}\ClipNest.exe"
+Name: "{autoprograms}\卸载 ClipNest"; Filename: "{uninstallexe}"
 Name: "{autodesktop}\ClipNest"; Filename: "{app}\ClipNest.exe"; Tasks: desktopicon
 
 [Run]
@@ -71,6 +74,29 @@ Type: filesandordirs; Name: "{%LOCALAPPDATA}\ClipNest\updates"
 const
   StartupKey = 'Software\Microsoft\Windows\CurrentVersion\Run';
   StartupName = 'ClipNest';
+
+var
+  RemoveUserData: Boolean;
+
+function InitializeUninstall: Boolean;
+var
+  Choice: Integer;
+begin
+  if UninstallSilent then begin
+    RemoveUserData := False;
+    Result := True;
+    Exit;
+  end;
+  Choice := MsgBox(
+    '是否同时删除 ClipNest 的本地剪贴记录和设置？' + #13#10 + #13#10 +
+    '是：彻底删除记录、密钥、设置和更新缓存。' + #13#10 +
+    '否：保留记录和密钥，以便同一 Windows 账户重装后继续使用。' + #13#10 +
+    '取消：停止卸载。' + #13#10 + #13#10 +
+    '无论选择哪种方式，已保存的 GitHub 访问令牌都会删除。',
+    mbConfirmation, MB_YESNOCANCEL or MB_DEFBUTTON1);
+  RemoveUserData := Choice = IDYES;
+  Result := Choice <> IDCANCEL;
+end;
 
 function IsClipNestStartup(const Value: String): Boolean;
 begin
@@ -104,10 +130,20 @@ procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 var
   OldValue: String;
   InstalledExe: String;
+  ExitCode: Integer;
 begin
   if CurUninstallStep <> usUninstall then Exit;
-  if not RegQueryStringValue(HKCU, StartupKey, StartupName, OldValue) then Exit;
-  InstalledExe := Lowercase(ExpandConstant('{app}\ClipNest.exe'));
-  if Pos(InstalledExe, Lowercase(OldValue)) > 0 then
-    RegDeleteValue(HKCU, StartupKey, StartupName);
+  InstalledExe := ExpandConstant('{app}\ClipNest.exe');
+  if RegQueryStringValue(HKCU, StartupKey, StartupName, OldValue) then
+    if Pos(Lowercase(InstalledExe), Lowercase(OldValue)) > 0 then
+      RegDeleteValue(HKCU, StartupKey, StartupName);
+  if not FileExists(InstalledExe) then Exit;
+  Exec(InstalledExe, '--quit', '', SW_HIDE, ewWaitUntilTerminated, ExitCode);
+  Sleep(750);
+  if RemoveUserData then begin
+    if (not Exec(InstalledExe, '--purge-user-data', '', SW_HIDE,
+      ewWaitUntilTerminated, ExitCode)) or (ExitCode <> 0) then
+      MsgBox('ClipNest 程序已卸载，但本地记录可能未清除。请检查数据保存目录。',
+        mbError, MB_OK);
+  end;
 end;
