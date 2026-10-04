@@ -64,9 +64,19 @@ MAX_IMAGE = 12_000_000
 MAX_MIME = 32_000_000
 DEFAULT_HOTKEY = "Ctrl+Alt+Q"
 APPEARANCE_MODES = (("默认", "default"), ("黑暗模式", "dark"), ("跟随系统", "system"))
+ACRYLIC_OPACITIES = (("透明 · 54%", 54), ("默认 · 70%", 70), ("不透明 · 90%", 90))
 STARTUP_KEY = r"Software\Microsoft\Windows\CurrentVersion\Run"
 KIND_NAMES = {"text": "文本", "markdown": "Markdown", "link": "链接", "code": "代码", "color": "颜色", "image": "图片", "files": "文件"}
-KIND_COLORS = {"text": "#c9cdd4", "markdown": "#a9c2dc", "link": "#9bcbb6", "code": "#3d4248", "color": "#c8b5d8", "image": "#ddaeb1", "files": "#d7c3a0"}
+CARD_PALETTE = {
+    # Each pair is (preview surface, lighter type label); first light, then dark.
+    "text": (("#d3d8df", "#eaedf1"), ("#35373b", "#4d4f53")),
+    "markdown": (("#eaf1f8", "#f8fbfe"), ("#1c2934", "#344453")),
+    "link": (("#e5f3ec", "#f4faf6"), ("#1c382f", "#355a4b")),
+    "code": (("#1b1d22", "#383b42"), ("#1b1d21", "#373a40")),
+    "color": (("#efeaf4", "#faf6fd"), ("#2c2533", "#4b3f56")),
+    "image": (("#f6e8eb", "#fff3f5"), ("#2a2027", "#483840")),
+    "files": (("#f6efdf", "#fff8e8"), ("#302a21", "#514737")),
+}
 CARD_WIDTH = 188
 CARD_HEIGHT = 176
 CARD_GAP = 11
@@ -1321,6 +1331,31 @@ def system_dark_mode() -> bool:
         return False
 
 
+def system_transparency_enabled() -> bool:
+    if os.name != "nt":
+        return False
+    try:
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER,
+                            r"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize") as key:
+            return winreg.QueryValueEx(key, "EnableTransparency")[0] != 0
+    except OSError:
+        return True
+
+
+def apply_desktop_acrylic(hwnd: int, dark: bool) -> bool:
+    """Request the Windows 11 transient-window backdrop; callers paint a solid fallback."""
+    if os.name != "nt" or sys.getwindowsversion().build < 22621 or not system_transparency_enabled():
+        return False
+    try:
+        dwm = ctypes.windll.dwmapi.DwmSetWindowAttribute
+        preference = ctypes.c_int(int(dark))
+        dwm(hwnd, 20, ctypes.byref(preference), ctypes.sizeof(preference))  # immersive dark mode
+        backdrop = ctypes.c_int(3)  # DWMSBT_TRANSIENTWINDOW: Desktop Acrylic
+        return dwm(hwnd, 38, ctypes.byref(backdrop), ctypes.sizeof(backdrop)) == 0
+    except (AttributeError, OSError, ValueError):
+        return False
+
+
 def effective_dark_mode(mode: str) -> bool:
     return mode == "dark" or mode == "system" and system_dark_mode()
 
@@ -1328,6 +1363,15 @@ def effective_dark_mode(mode: str) -> bool:
 def dark_mode() -> bool:
     app = QApplication.instance()
     return bool(app and app.property("dark_mode"))
+
+
+def selection_accent() -> QColor:
+    return QColor("#b8b7b2") if dark_mode() else theme_accent()
+
+
+def card_palette(kind: str) -> tuple[str, str]:
+    light, dark = CARD_PALETTE.get(kind, CARD_PALETTE["text"])
+    return dark if dark_mode() else light
 
 
 DARK_COLORS = {
@@ -1375,7 +1419,11 @@ def theme_style(accent: str) -> str:
                  .replace("#dca9a6", color.lighter(155).name())
                   .replace("#f7e9e8", theme_tint(12).name()))
     if dark_mode():
-        style += "\nQPushButton#accent { color:#ffffff; }\nQPushButton#accent:hover { color:#ffffff; }"
+        style += ("\nQPushButton#accent { color:#ffffff; }"
+                  "\nQPushButton#accent:hover { color:#ffffff; }"
+                  "\nQFrame#card { background:#111317; border-color:#36383d; }"
+                  "\nQLabel#cardTitle { color:#f0eee9; }"
+                  "\nQLabel#meta { color:#aaa9a7; }")
     return style
 
 
@@ -1654,8 +1702,14 @@ class RoundedPanel(QFrame):
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
-        painter.setPen(QPen(themed_color("#e9e4e8"), 1))
-        painter.setBrush(themed_color("#f7f5f6"))
+        app = QApplication.instance()
+        opacity = int(app.property("acrylic_opacity") or 70)
+        backdrop = bool(app.property("acrylic_enabled"))
+        surface = QColor("#26252b" if dark_mode() else "#f7f5f6")
+        surface.setAlpha(round(255 * opacity / 100) if backdrop else 255)
+        border = QColor(234, 231, 227, 28) if dark_mode() else QColor("#e9e4e8")
+        painter.setPen(QPen(border, 1))
+        painter.setBrush(surface)
         painter.drawRoundedRect(QRectF(0.5, 0.5, self.width() - 1, self.height() - 1), 22, 22)
         painter.end()
 
@@ -1792,8 +1846,8 @@ class BoardTabButton(QPushButton):
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
-        painter.setPen(QPen(theme_accent().lighter(155) if self.selected else themed_color("#e6e2e6"), 1))
-        painter.setBrush(theme_tint(13) if self.selected else themed_color("#f9f9fa" if self.underMouse() else "#ffffff"))
+        painter.setPen(QPen(selection_accent().lighter(110) if self.selected else themed_color("#e6e2e6"), 1))
+        painter.setBrush(QColor(184, 183, 178, 24) if self.selected and dark_mode() else theme_tint(13) if self.selected else themed_color("#f9f9fa" if self.underMouse() else "#ffffff"))
         painter.drawRoundedRect(QRectF(1.2, 1.2, self.width() - 2.4, self.height() - 2.4), 9, 9)
         painter.setPen(Qt.NoPen)
         painter.setBrush(self.indicator_color)
@@ -1801,7 +1855,7 @@ class BoardTabButton(QPushButton):
         font = self.font()
         font.setBold(self.selected)
         painter.setFont(font)
-        painter.setPen(theme_accent() if self.selected else themed_color("#202026"))
+        painter.setPen(selection_accent() if self.selected else themed_color("#202026"))
         painter.drawText(QRectF(25, 0, self.width() - 33, self.height()),
                          Qt.AlignLeft | Qt.AlignVCenter, self.text())
         painter.end()
@@ -1930,10 +1984,10 @@ class SelectionOutline(QWidget):
         painter.setRenderHint(QPainter.Antialiasing)
         painter.setBrush(Qt.NoBrush)
         if self.selected:
-            painter.setPen(QPen(theme_accent(), 3))
+            painter.setPen(QPen(selection_accent(), 2 if dark_mode() else 3))
             painter.drawRoundedRect(QRectF(1.5, 1.5, self.width() - 3, self.height() - 3), 14, 14)
         if self.drop_before is not None:
-            painter.setPen(QPen(theme_accent().darker(115), 4, Qt.SolidLine, Qt.RoundCap))
+            painter.setPen(QPen(selection_accent().darker(115), 4, Qt.SolidLine, Qt.RoundCap))
             x = 3 if self.drop_before else self.width() - 3
             painter.drawLine(QPointF(x, 12), QPointF(x, self.height() - 12))
         painter.end()
@@ -1956,11 +2010,22 @@ class Card(QFrame):
         self._dragging = False
         outer = QVBoxLayout(self); outer.setContentsMargins(0, 0, 0, 0); outer.setSpacing(0)
         kind = clip["kind"]
-        head = QLabel("●  " + KIND_NAMES.get(kind, kind)); head.setFixedHeight(24)
-        head.setStyleSheet(f"background:{KIND_COLORS.get(kind,'#ddd')}; border-top-left-radius:14px;border-top-right-radius:14px;padding-left:10px;font-size:10px;font-weight:800;color:{'#ffffff' if kind == 'code' else '#302d36'};")
-        outer.addWidget(head)
-        body = QFrame(); body.setStyleSheet(themed_css("background:#fff;"))
-        b = QVBoxLayout(body); b.setContentsMargins(11, 10, 11, 8)
+        surface, chip_color = card_palette(kind)
+        unit = QFrame(); unit.setObjectName("previewUnit")
+        unit.setStyleSheet(f"QFrame#previewUnit {{ background:{surface};border-top-left-radius:14px;border-top-right-radius:14px; }}")
+        unit.setFixedHeight(CARD_HEIGHT - 34)
+        unit_layout = QVBoxLayout(unit); unit_layout.setContentsMargins(0, 0, 0, 0); unit_layout.setSpacing(0)
+        header = QFrame(); header.setStyleSheet("background:transparent;"); header.setFixedHeight(33)
+        header_layout = QHBoxLayout(header); header_layout.setContentsMargins(8, 5, 8, 5)
+        type_name = KIND_NAMES.get(kind, kind)
+        head = QLabel(type_name)
+        head.setAlignment(Qt.AlignCenter); head.setFixedHeight(22)
+        head.setFixedWidth(max(38, head.fontMetrics().horizontalAdvance(type_name) + 18))
+        head.setStyleSheet(f"background:{chip_color};border-radius:7px;padding:0 7px;font-size:10px;font-weight:800;color:{'#f5f1ec' if dark_mode() or kind == 'code' else '#302d36'};")
+        header_layout.addWidget(head); header_layout.addStretch(1)
+        unit_layout.addWidget(header)
+        body = QFrame(); body.setStyleSheet("background:transparent;")
+        b = QVBoxLayout(body); b.setContentsMargins(11, 1, 11, 8)
         preview = QLabel(); preview.setObjectName("preview"); preview.setWordWrap(True)
         preview.setAlignment(Qt.AlignTop | Qt.AlignLeft)
         if kind == "image":
@@ -1970,7 +2035,7 @@ class Card(QFrame):
                 preview.setPixmap(pixmap.scaled(CARD_WIDTH - 26, 100, Qt.KeepAspectRatio, Qt.SmoothTransformation))
             else:
                 preview.setText("▧  图片预览")
-            preview.setStyleSheet(themed_css("background:#f7e9ed;border-radius:7px;color:#be778e;font-size:15px;"))
+            preview.setStyleSheet(f"background:transparent;color:{'#deb0c1' if dark_mode() else '#be778e'};font-size:15px;")
         elif kind == "color":
             color = clip["text_data"].strip(); color = color if color.startswith("#") else "#" + color
             preview.setText(color.upper()); preview.setAlignment(Qt.AlignCenter)
@@ -1981,16 +2046,16 @@ class Card(QFrame):
             preview.setAlignment(Qt.AlignCenter)
             preview.setPixmap(file_type_icon(path, len(file_paths)))
             preview.setToolTip(file_kind(path)[0] if len(file_paths) == 1 else f"{file_kind(path)[0]} · {len(file_paths)} 个文件")
-            preview.setStyleSheet(themed_css("background:#ffffff;border-radius:8px;"))
+            preview.setStyleSheet("background:transparent;")
         elif kind == "link":
             name, host, glyph, color = link_identity(clip["text_data"])
             name = display_title(clip)
             site = clip["preview_site"] or link_identity(clip["text_data"])[0]
             link_box = QFrame()
             link_box.setObjectName("linkPreview")
-            link_box.setStyleSheet(themed_css("QFrame#linkPreview { background:#eaf6f2; border-radius:8px; }"))
+            link_box.setStyleSheet("QFrame#linkPreview { background:transparent; }")
             link_layout = QVBoxLayout(link_box)
-            link_layout.setContentsMargins(10, 4, 10, 4)
+            link_layout.setContentsMargins(5, 4, 5, 4)
             link_layout.setSpacing(1)
             badge = QLabel(glyph)
             badge.setAlignment(Qt.AlignCenter)
@@ -1998,7 +2063,7 @@ class Card(QFrame):
             if clip["preview_icon"]:
                 icon_image = QPixmap(); icon_image.loadFromData(clip["preview_icon"])
                 if not icon_image.isNull(): badge.setPixmap(icon_image.scaled(40, 40, Qt.KeepAspectRatio, Qt.SmoothTransformation))
-                badge.setStyleSheet(themed_css("background:#fff;color:#25483f;border-radius:10px;"))
+                badge.setStyleSheet(f"background:{'#f4faf6' if dark_mode() else '#fff'};color:#25483f;border-radius:10px;")
             else:
                 badge.setStyleSheet(f"background:{color};color:white;border-radius:10px;font-size:15px;font-weight:800;")
             link_layout.addWidget(badge)
@@ -2007,25 +2072,28 @@ class Card(QFrame):
             name_label.setTextFormat(Qt.PlainText)
             name_label.setWordWrap(True)
             name_label.setFixedHeight(30)
-            name_label.setStyleSheet(themed_css("background:transparent;font-size:13px;font-weight:700;color:#25483f;"))
+            name_label.setStyleSheet(f"background:transparent;font-size:13px;font-weight:700;color:{'#f1f6f2' if dark_mode() else '#25483f'};")
             name_label.setToolTip(name)
             name_label.setText(name[:80])
             link_layout.addWidget(name_label)
             domain = QLabel(site if site != name else host)
             domain.setTextFormat(Qt.PlainText)
-            domain.setStyleSheet(themed_css("background:transparent;font-size:10px;color:#63877d;"))
+            domain.setStyleSheet(f"background:transparent;font-size:10px;color:{'#9eb6aa' if dark_mode() else '#63877d'};")
             domain.setText(domain.fontMetrics().elidedText(domain.text(), Qt.ElideRight, CARD_WIDTH - 50))
             link_layout.addWidget(domain)
             preview = link_box
         else:
             value = clip["text_data"].strip()
             preview.setText(value[:230] + ("…" if len(value) > 230 else ""))
-            if kind == "code": preview.setStyleSheet("background:#151515;color:#ffffff;border-radius:7px;padding:6px;font-family:Consolas;font-size:10px;")
+            if kind == "code": preview.setStyleSheet("background:transparent;color:#ffffff;font-family:Consolas;font-size:10px;")
             elif kind == "markdown":
-                preview.setStyleSheet(themed_css("background:#eef4fa;color:#344b63;border-radius:7px;padding:7px;font-family:Consolas;font-size:10px;"))
+                preview.setStyleSheet(f"background:transparent;color:{'#d8e4ef' if dark_mode() else '#344b63'};font-family:Consolas;font-size:10px;")
+            else:
+                preview.setStyleSheet(f"background:transparent;color:{'#f1f0ed' if dark_mode() else '#302d36'};font-size:13px;")
         preview.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding); b.addWidget(preview)
-        outer.addWidget(body, 1)
-        foot = QFrame(); foot.setFixedHeight(34); foot.setStyleSheet(themed_css("background:#fff;border-bottom-left-radius:14px;border-bottom-right-radius:14px;"))
+        unit_layout.addWidget(body, 1)
+        outer.addWidget(unit)
+        foot = QFrame(); foot.setFixedHeight(34); foot.setStyleSheet(f"background:{'#111317' if dark_mode() else '#fff'};border-bottom-left-radius:14px;border-bottom-right-radius:14px;")
         fl = QVBoxLayout(foot); fl.setContentsMargins(10, 0, 10, 6); fl.setSpacing(1)
         shown_title = link_identity(clip["text_data"])[1] if kind == "link" else display_title(clip)
         title = QLabel(shown_title); title.setObjectName("cardTitle"); title.setToolTip(shown_title)
@@ -2194,6 +2262,20 @@ class SettingsDialog(QDialog):
         self.appearance_mode.currentIndexChanged.connect(self.change_appearance_mode)
         self.appearance_mode.setFixedWidth(130)
         appearance.addWidget(self.appearance_mode)
+        appearance.addSpacing(10)
+        appearance.addWidget(QLabel("亚克力透明度 · 默认与黑暗模式共用"))
+        self.acrylic_opacity = StyledComboBox()
+        for label, value in ACRYLIC_OPACITIES:
+            self.acrylic_opacity.addItem(label, value)
+        try:
+            opacity = int(parent.store.setting("acrylic_opacity", "70"))
+        except ValueError:
+            opacity = 70
+        self.acrylic_opacity.setCurrentIndex(next((i for i, (_, value) in enumerate(ACRYLIC_OPACITIES)
+                                                   if value == opacity), 1))
+        self.acrylic_opacity.currentIndexChanged.connect(self.change_acrylic_opacity)
+        self.acrylic_opacity.setFixedWidth(160)
+        appearance.addWidget(self.acrylic_opacity)
         appearance.addSpacing(10)
         appearance.addWidget(QLabel("主题色 · 选中框与主要按钮"))
         colors = QHBoxLayout(); colors.setSpacing(8)
@@ -2535,6 +2617,9 @@ class SettingsDialog(QDialog):
     def change_appearance_mode(self, index: int):
         self.parent_app.apply_appearance_mode(APPEARANCE_MODES[index][1], save=True)
 
+    def change_acrylic_opacity(self, index: int):
+        self.parent_app.apply_acrylic_opacity(ACRYLIC_OPACITIES[index][1])
+
     def change_front_pasted_items(self, enabled: bool):
         if self.save_checkbox(self.front_pasted_items, "front_pasted_items", enabled):
             self.parent_app.refresh()
@@ -2750,6 +2835,20 @@ class Shelf(QWidget):
             no_border = ctypes.c_uint(0xFFFFFFFE)
             ctypes.windll.dwmapi.DwmSetWindowAttribute(
                 int(self.winId()), 34, ctypes.byref(no_border), ctypes.sizeof(no_border))
+        self.configure_backdrop()
+
+    def configure_backdrop(self):
+        app = QApplication.instance()
+        enabled = apply_desktop_acrylic(int(self.winId()), dark_mode()) if os.name == "nt" else False
+        app.setProperty("acrylic_enabled", enabled)
+        self.panel.update()
+
+    def apply_acrylic_opacity(self, opacity: int):
+        if opacity not in {value for _, value in ACRYLIC_OPACITIES}:
+            return
+        self.store.set_setting("acrylic_opacity", str(opacity))
+        QApplication.instance().setProperty("acrylic_opacity", opacity)
+        self.panel.update()
 
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -2795,6 +2894,7 @@ class Shelf(QWidget):
             return
         app.setProperty("dark_mode", dark)
         app.setStyleSheet(theme_style(self.store.setting("theme_accent", DEFAULT_ACCENT)))
+        self.configure_backdrop()
         self.refresh_tabs()
         self.refresh_preserving_view()
         self.update()
@@ -3417,6 +3517,12 @@ def main():
     accent = store.setting("theme_accent", DEFAULT_ACCENT)
     app.setProperty("theme_accent", accent)
     app.setProperty("dark_mode", effective_dark_mode(store.setting("appearance_mode", "system")))
+    try:
+        opacity = int(store.setting("acrylic_opacity", "70"))
+    except ValueError:
+        opacity = 70
+    app.setProperty("acrylic_opacity", opacity if opacity in {value for _, value in ACRYLIC_OPACITIES} else 70)
+    app.setProperty("acrylic_enabled", False)
     app.setStyleSheet(theme_style(accent))
     shelf = Shelf(store); app.aboutToQuit.connect(shelf.shutdown)
     QTimer.singleShot(15000, clear_update_cache)
