@@ -1,0 +1,40 @@
+name: Verify ClipNest desktop package
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'desktop/**'
+      - '.github/workflows/verify-desktop.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  package-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check source and build installer
+        shell: pwsh
+        run: |
+          python -m py_compile desktop/versions/1.30/clipnest.py
+          & ./desktop/build-release.ps1 -Version 1.30
+          if ($LASTEXITCODE -ne 0) { throw '1.30 build failed.' }
+          $program = 'build/1.30/dist/ClipNest/ClipNest.exe'
+          $installer = 'release-output/ClipNest-1.30-Setup-x64.exe'
+          if (-not (Test-Path $program)) { throw "Missing main program: $program" }
+          if (-not (Test-Path $installer)) { throw "Missing installer: $installer" }
+          if ((Get-Item $program).Length -lt 1MB) { throw 'Main program is unexpectedly small.' }
+          if ((Get-Item $installer).Length -lt 5MB) { throw 'Installer is unexpectedly small.' }
+          Write-Output "Program SHA256=$((Get-FileHash $program -Algorithm SHA256).Hash)"
+          Write-Output "Installer SHA256=$((Get-FileHash $installer -Algorithm SHA256).Hash)"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ClipNest-1.30-package-check
+          path: release-output/ClipNest-1.30-Setup-x64.exe
+          if-no-files-found: error
+
