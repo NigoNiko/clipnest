@@ -3330,7 +3330,7 @@ class Shelf(QWidget):
                 if self.board_id is None:
                     self.refresh()
             except Exception as exc:
-                self.set_status(f"粘贴成功，但前置记录失败：{exc}")
+                self.set_status(f"已发送粘贴快捷键，但前置记录失败：{exc}")
 
     def preview_clip(self, clip_id):
         row = self.store.get(clip_id)
