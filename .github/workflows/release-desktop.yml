@@ -19,13 +19,13 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Build and publish Version 1.30
+      - name: Build and publish Version 1.31
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           $ErrorActionPreference = 'Stop'
-          $version = '1.30'
+          $version = '1.31'
           & ./desktop/build-release.ps1 -Version $version
           if ($LASTEXITCODE -ne 0) { throw "Build $version failed." }
           $asset = "release-output/ClipNest-$version-Setup-x64.exe"
