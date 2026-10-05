@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet('1.20', '1.21', '1.22', '1.23', '1.24', '1.25', '1.26', '1.27', '1.28', '1.29', '1.30', '1.31', '1.32')]
+    [ValidateSet('1.20', '1.21', '1.22', '1.23', '1.24', '1.25', '1.26', '1.27', '1.28', '1.29', '1.30', '1.31', '1.32', '1.33')]
     [string] $Version
 )
 
@@ -17,7 +17,7 @@ $iconBytes = [Convert]::FromBase64String((Get-Content (Join-Path $desktopRoot 'a
 [IO.File]::WriteAllBytes((Join-Path $sourceDir 'ClipNest.ico'), $iconBytes)
 
 $dependencies = @('PySide6==6.9.2', 'PyInstaller==6.16.0')
-if ($Version -in @('1.25', '1.26', '1.27', '1.28', '1.29', '1.30', '1.31', '1.32')) { $dependencies += 'sqlcipher3==0.6.2' }
+if ($Version -in @('1.25', '1.26', '1.27', '1.28', '1.29', '1.30', '1.31', '1.32', '1.33')) { $dependencies += 'sqlcipher3==0.6.2' }
 python -m pip install --disable-pip-version-check @dependencies
 if ($LASTEXITCODE -ne 0) { throw 'Installing Python build dependencies failed.' }
 python -m PyInstaller --noconfirm --distpath $distRoot --workpath (Join-Path $buildRoot 'pyinstaller') (Join-Path $sourceDir 'ClipNest.spec')
