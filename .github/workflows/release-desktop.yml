@@ -2,6 +2,10 @@ name: Release ClipNest desktop
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'desktop/release-notes/1.34.md'
 
 permissions:
   contents: write
