@@ -1,10 +1,6 @@
 name: Release ClipNest desktop
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/release-desktop.yml'
   workflow_dispatch:
 
 permissions:
