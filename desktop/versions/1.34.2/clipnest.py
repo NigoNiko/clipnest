@@ -77,6 +77,7 @@ CARD_PALETTE = {
     "image": (("#f6e8eb", "#c47b91"), ("#2a2027", "#1b1018")),
     "files": (("#f6efdf", "#b18e53"), ("#302a21", "#1c160e")),
 }
+FILE_ICON_DIR = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parents[2])) / "assets" / "file-icons"
 CARD_WIDTH = 188
 CARD_HEIGHT = 168
 CARD_GAP = 14
@@ -332,99 +333,54 @@ def download_update(release: dict, token: str) -> Path:
 
 
 def file_kind(path: str) -> tuple[str, str, str]:
+    if path and Path(path).is_dir():
+        return "文件夹", "folder", "#e9b348"
     extension = Path(path).suffix.lower()
     groups = (
-        ({".xlsx", ".xls", ".xlsm", ".xlsb", ".csv", ".ods"}, "Excel 表格", "X", "#188656"),
-        ({".docx", ".doc", ".docm", ".odt", ".rtf"}, "Word 文档", "W", "#2769bb"),
-        ({".pptx", ".ppt", ".pptm", ".odp"}, "PowerPoint 演示", "P", "#d66a38"),
-        ({".pdf"}, "PDF 文档", "PDF", "#d95354"),
-        ({".txt", ".md", ".log"}, "文本文档", "TXT", "#657c99"),
-        ({".zip", ".7z", ".rar", ".tar", ".gz"}, "压缩文件", "ZIP", "#bd8b37"),
-        ({".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".svg"}, "图片文件", "▧", "#9a6bc0"),
+        ({".xlsx", ".xls", ".xlsm", ".xlsb", ".csv", ".ods"}, "Excel 表格", "excel", "#00ae68"),
+        ({".docx", ".doc", ".docm", ".odt", ".rtf"}, "Word 文档", "word", "#418bf7"),
+        ({".pptx", ".ppt", ".pptm", ".odp"}, "PowerPoint 演示", "powerpoint", "#f46b34"),
+        ({".pdf"}, "PDF 文档", "pdf", "#e94449"),
+        ({".txt", ".md", ".log"}, "文本文档", "text", "#7892aa"),
+        ({".zip", ".7z", ".rar", ".tar", ".gz"}, "压缩文件", "archive", "#c7d1da"),
+        ({".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".svg"}, "图片文件", "photo", "#29bba4"),
+        ({".mp3", ".wav", ".flac", ".m4a", ".aac", ".ogg"}, "音频文件", "audio", "#f9b51e"),
+        ({".mp4", ".mov", ".mkv", ".avi", ".wmv", ".webm"}, "视频文件", "video", "#4059e8"),
     )
-    for extensions, label, glyph, color in groups:
-        if extension in extensions: return label, glyph, color
-    return "文件", "▤", "#66758b"
+    for extensions, label, name, color in groups:
+        if extension in extensions: return label, name, color
+    return "文件", "generic", "#424242"
 
 
 def file_type_icon(path: str, count: int = 1) -> QPixmap:
-    """Draw every file type with one consistent, resolution-independent shape."""
-    _, glyph, hex_color = file_kind(path)
-    name = {"X": "excel", "W": "word", "P": "powerpoint", "PDF": "pdf",
-            "TXT": "text", "ZIP": "archive", "▧": "photo"}.get(glyph, "generic")
-    return _render_file_type_icon(name, glyph, hex_color, count)
+    """Display the supplied Sketch icon set, with a matching drawn TXT variant."""
+    _, name, _ = file_kind(path)
+    return _render_file_type_icon(name, count)
 
 
 @lru_cache(maxsize=64)
-def _render_file_type_icon(name: str, glyph: str, hex_color: str, count: int) -> QPixmap:
-    # Render at double resolution so high-DPI Windows screens keep clean edges.
-    color = QColor(hex_color)
+def _render_file_type_icon(name: str, count: int) -> QPixmap:
+    source = QPixmap(str(FILE_ICON_DIR / f"{name}.png"))
+    if source.isNull():
+        source = QPixmap(str(FILE_ICON_DIR / "generic.png"))
     pix = QPixmap(300, 200); pix.setDevicePixelRatio(2); pix.fill(Qt.transparent)
     painter = QPainter(pix)
-    painter.setRenderHints(QPainter.Antialiasing | QPainter.TextAntialiasing)
-
-    shadow = QColor("#182533"); shadow.setAlpha(37)
-    painter.setPen(Qt.NoPen)
-    painter.setBrush(shadow)
-    painter.drawRoundedRect(QRectF(44, 12, 78, 80), 17, 17)
-    gradient = QLinearGradient(42, 9, 122, 91)
-    gradient.setColorAt(0, color.lighter(165))
-    gradient.setColorAt(0.48, color.lighter(115))
-    gradient.setColorAt(1, color.darker(140))
-    painter.setBrush(gradient)
-    painter.drawRoundedRect(QRectF(42, 9, 78, 80), 17, 17)
-
-    # The right-hand page gives all formats the same recognizable silhouette.
-    paper = QColor("#ffffff"); paper.setAlpha(218)
-    painter.setBrush(paper)
-    painter.drawRoundedRect(QRectF(68, 23, 40, 49), 5, 5)
-    detail = color.darker(135)
-    detail.setAlpha(190)
-    painter.setPen(QPen(detail, 1.5, Qt.SolidLine, Qt.RoundCap))
-    if name == "excel":
-        for y in (32, 40, 48, 56, 64):
-            painter.drawLine(QPointF(74, y), QPointF(102, y))
-        for x in (74, 83, 93, 102):
-            painter.drawLine(QPointF(x, 32), QPointF(x, 64))
-    elif name == "powerpoint":
-        painter.drawEllipse(QRectF(77, 35, 22, 22))
-        painter.drawLine(QPointF(88, 35), QPointF(88, 46))
-        painter.drawLine(QPointF(88, 46), QPointF(99, 46))
-    elif name == "archive":
-        painter.drawLine(QPointF(88, 29), QPointF(88, 63))
-        for y in (34, 40, 46, 52, 58):
-            painter.drawLine(QPointF(86, y), QPointF(90, y))
-    elif name == "photo":
-        painter.drawEllipse(QRectF(93, 32, 7, 7))
-        painter.drawLine(QPointF(74, 62), QPointF(84, 48))
-        painter.drawLine(QPointF(84, 48), QPointF(91, 55))
-        painter.drawLine(QPointF(91, 55), QPointF(97, 47))
-        painter.drawLine(QPointF(97, 47), QPointF(103, 62))
-        painter.drawLine(QPointF(74, 62), QPointF(103, 62))
+    painter.setRenderHint(QPainter.Antialiasing)
+    if source.isNull():
+        painter.setPen(Qt.NoPen)
+        painter.setBrush(QColor("#424242"))
+        painter.drawRoundedRect(QRectF(43, 7, 75, 86), 12, 12)
     else:
-        for y, end in ((33, 101), (41, 98), (49, 102), (57, 94), (65, 99)):
-            painter.drawLine(QPointF(75, y), QPointF(end, y))
-
-    badge_shadow = QColor("#12202d"); badge_shadow.setAlpha(38)
-    painter.setPen(Qt.NoPen)
-    painter.setBrush(badge_shadow)
-    painter.drawRoundedRect(QRectF(35, 52, 47, 35), 10, 10)
-    badge_gradient = QLinearGradient(35, 49, 78, 84)
-    badge_gradient.setColorAt(0, color.darker(104))
-    badge_gradient.setColorAt(1, color.darker(160))
-    painter.setBrush(badge_gradient)
-    painter.drawRoundedRect(QRectF(35, 49, 47, 35), 10, 10)
-    painter.setPen(QColor("#ffffff"))
-    badge_label = "IMG" if name == "photo" else "FILE" if name == "generic" else glyph
-    font = painter.font(); font.setBold(True)
-    font.setPixelSize(27 if len(badge_label) == 1 else 14 if len(badge_label) == 3 else 11 if len(badge_label) == 4 else 19)
-    painter.setFont(font)
-    painter.drawText(QRectF(35, 49, 47, 35), Qt.AlignCenter, badge_label)
+        icon = source.scaled(174, 174, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        icon.setDevicePixelRatio(2)
+        width = icon.width() / icon.devicePixelRatio()
+        height = icon.height() / icon.devicePixelRatio()
+        painter.drawPixmap(QPointF((150 - width) / 2, (100 - height) / 2), icon)
     if count > 1:
         painter.setPen(Qt.NoPen); painter.setBrush(QColor("#425266"))
         painter.drawRoundedRect(QRectF(117, 5, 28, 22), 8, 8)
         painter.setPen(QColor("#ffffff"))
-        font.setPixelSize(12); painter.setFont(font)
+        font = painter.font(); font.setPixelSize(12); font.setBold(True); painter.setFont(font)
         painter.drawText(QRectF(117, 5, 28, 22), Qt.AlignCenter, str(count))
     painter.end()
     return pix

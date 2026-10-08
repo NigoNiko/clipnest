@@ -6,7 +6,7 @@ a = Analysis(
     [str(project / 'clipnest.py')],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[(str(project.parents[1] / 'assets' / 'file-icons'), 'assets/file-icons')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
