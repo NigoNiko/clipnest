@@ -352,37 +352,40 @@ def file_kind(path: str) -> tuple[str, str, str]:
     return "文件", "generic", "#424242"
 
 
-def file_type_icon(path: str, count: int = 1) -> QPixmap:
+def file_type_icon(path: str, count: int = 1, compact: bool = False) -> QPixmap:
     """Display the supplied Sketch icon set, with a matching drawn TXT variant."""
     _, name, _ = file_kind(path)
-    return _render_file_type_icon(name, count)
+    return _render_file_type_icon(name, count, compact)
 
 
 @lru_cache(maxsize=64)
-def _render_file_type_icon(name: str, count: int) -> QPixmap:
+def _render_file_type_icon(name: str, count: int, compact: bool = False) -> QPixmap:
     source = QPixmap(str(FILE_ICON_DIR / f"{name}.png"))
     if source.isNull():
         source = QPixmap(str(FILE_ICON_DIR / "generic.png"))
-    pix = QPixmap(300, 200); pix.setDevicePixelRatio(2); pix.fill(Qt.transparent)
+    canvas_height = 66 if compact else 100
+    pix = QPixmap(300, canvas_height * 2); pix.setDevicePixelRatio(2); pix.fill(Qt.transparent)
     painter = QPainter(pix)
     painter.setRenderHint(QPainter.Antialiasing)
     if source.isNull():
         painter.setPen(Qt.NoPen)
         painter.setBrush(QColor("#424242"))
-        painter.drawRoundedRect(QRectF(43, 7, 75, 86), 12, 12)
+        painter.drawRoundedRect(QRectF(51, 4, 48, 58) if compact else QRectF(43, 7, 75, 86), 12, 12)
     else:
-        # Match the supplied 100 × 120 icon proportions at 60 × 72 logical px.
-        icon = source.scaled(120, 144, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        # Reserve the line below the icon for the filename on file cards.
+        icon = source.scaled(96 if compact else 120, 116 if compact else 144,
+                             Qt.KeepAspectRatio, Qt.SmoothTransformation)
         icon.setDevicePixelRatio(2)
         width = icon.width() / icon.devicePixelRatio()
         height = icon.height() / icon.devicePixelRatio()
-        painter.drawPixmap(QPointF((150 - width) / 2, (100 - height) / 2), icon)
+        painter.drawPixmap(QPointF((150 - width) / 2, (canvas_height - height) / 2), icon)
     if count > 1:
         painter.setPen(Qt.NoPen); painter.setBrush(QColor("#425266"))
-        painter.drawRoundedRect(QRectF(117, 5, 28, 22), 8, 8)
+        badge = QRectF(120, 2, 25, 19) if compact else QRectF(117, 5, 28, 22)
+        painter.drawRoundedRect(badge, 8, 8)
         painter.setPen(QColor("#ffffff"))
-        font = painter.font(); font.setPixelSize(12); font.setBold(True); painter.setFont(font)
-        painter.drawText(QRectF(117, 5, 28, 22), Qt.AlignCenter, str(count))
+        font = painter.font(); font.setPixelSize(11 if compact else 12); font.setBold(True); painter.setFont(font)
+        painter.drawText(badge, Qt.AlignCenter, str(count))
     painter.end()
     return pix
 
@@ -2088,10 +2091,30 @@ class Card(QFrame):
         elif kind == "files":
             file_paths = json.loads(clip["files_data"])
             path = file_paths[0] if file_paths else ""
-            preview.setAlignment(Qt.AlignCenter)
-            preview.setPixmap(file_type_icon(path, len(file_paths)))
-            preview.setToolTip(file_kind(path)[0] if len(file_paths) == 1 else f"{file_kind(path)[0]} · {len(file_paths)} 个文件")
-            preview.setStyleSheet("background:transparent;")
+            file_box = QFrame(); file_box.setObjectName("filePreview")
+            file_box.setStyleSheet("QFrame#filePreview { background:transparent; }")
+            file_layout = QVBoxLayout(file_box)
+            file_layout.setContentsMargins(0, 0, 0, 0)
+            file_layout.setSpacing(2)
+            file_layout.setAlignment(Qt.AlignVCenter)
+            file_icon = QLabel(); file_icon.setObjectName("fileIcon")
+            file_icon.setFixedHeight(66)
+            file_icon.setAlignment(Qt.AlignCenter)
+            file_icon.setPixmap(file_type_icon(path, len(file_paths), compact=True))
+            file_icon.setStyleSheet("background:transparent;")
+            file_layout.addWidget(file_icon)
+            file_name = QLabel(); file_name.setObjectName("fileName")
+            file_name.setTextFormat(Qt.PlainText)
+            file_name.setFixedHeight(18)
+            file_name.setAlignment(Qt.AlignCenter)
+            font = file_name.font(); font.setPixelSize(11); font.setWeight(QFont.DemiBold)
+            file_name.setFont(font)
+            filename = Path(path).name if path else "文件"
+            file_name.setText(file_name.fontMetrics().elidedText(filename, Qt.ElideMiddle, CARD_WIDTH - 34))
+            file_name.setToolTip("\n".join(file_paths[:8]) + ("\n…" if len(file_paths) > 8 else ""))
+            file_name.setStyleSheet(f"background:transparent;color:{'#f2eee7' if dark_mode() else '#423b35'};")
+            file_layout.addWidget(file_name)
+            preview = file_box
         elif kind == "link":
             name, host, glyph, color = link_identity(clip["text_data"])
             name = display_title(clip)
