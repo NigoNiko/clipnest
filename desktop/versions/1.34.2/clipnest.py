@@ -371,7 +371,8 @@ def _render_file_type_icon(name: str, count: int) -> QPixmap:
         painter.setBrush(QColor("#424242"))
         painter.drawRoundedRect(QRectF(43, 7, 75, 86), 12, 12)
     else:
-        icon = source.scaled(174, 174, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        # Match the supplied 100 × 120 icon proportions at 60 × 72 logical px.
+        icon = source.scaled(120, 144, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         icon.setDevicePixelRatio(2)
         width = icon.width() / icon.devicePixelRatio()
         height = icon.height() / icon.devicePixelRatio()

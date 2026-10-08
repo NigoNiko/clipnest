@@ -7,3 +7,5 @@ These PNGs were exported from the user-supplied `file-icons-seergb.zip` / `file-
 - The original ZIP did not include a license file. Confirm redistribution rights before making this icon set part of a public release.
 
 All PNGs are 300 × 360 pixels with transparency. The app scales them for the 150 × 100 pixel preview area and bundles them locally; card display makes no network request.
+
+The original Sketch corner uses a translucent fill designed for its black demo canvas. The exported PNGs use a fixed tint for that fold so it keeps the supplied palette on ClipNest's light and dark cards.
