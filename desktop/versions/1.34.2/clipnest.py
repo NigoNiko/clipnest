@@ -77,7 +77,6 @@ CARD_PALETTE = {
     "image": (("#f6e8eb", "#c47b91"), ("#2a2027", "#1b1018")),
     "files": (("#f6efdf", "#b18e53"), ("#302a21", "#1c160e")),
 }
-FILE_ICON_DIR = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parents[2])) / "assets" / "file-icons"
 CARD_WIDTH = 188
 CARD_HEIGHT = 168
 CARD_GAP = 14
@@ -349,7 +348,7 @@ def file_kind(path: str) -> tuple[str, str, str]:
 
 
 def file_type_icon(path: str, count: int = 1) -> QPixmap:
-    """Show a bundled high-resolution file icon without an extra preview box."""
+    """Draw every file type with one consistent, resolution-independent shape."""
     _, glyph, hex_color = file_kind(path)
     name = {"X": "excel", "W": "word", "P": "powerpoint", "PDF": "pdf",
             "TXT": "text", "ZIP": "archive", "▧": "photo"}.get(glyph, "generic")
@@ -358,54 +357,75 @@ def file_type_icon(path: str, count: int = 1) -> QPixmap:
 
 @lru_cache(maxsize=64)
 def _render_file_type_icon(name: str, glyph: str, hex_color: str, count: int) -> QPixmap:
-    icon = QPixmap(str(FILE_ICON_DIR / f"{name}.png"))
-    if not icon.isNull():
-        pix = QPixmap(150, 100); pix.fill(Qt.transparent)
-        size = 87 if count == 1 else 81
-        scaled = icon.scaled(size, size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        painter = QPainter(pix); painter.setRenderHint(QPainter.Antialiasing)
-        painter.drawPixmap((pix.width() - scaled.width()) // 2,
-                           (pix.height() - scaled.height()) // 2, scaled)
-        if count > 1:
-            painter.setPen(Qt.NoPen); painter.setBrush(QColor("#516273"))
-            painter.drawRoundedRect(QRectF(119, 5, 26, 22), 8, 8)
-            painter.setPen(QColor("#ffffff"))
-            font = painter.font(); font.setPixelSize(12); font.setBold(True)
-            painter.setFont(font)
-            painter.drawText(QRectF(119, 5, 26, 22), Qt.AlignCenter, str(count))
-        painter.end()
-        return pix
-    # A missing asset must not leave older clipboard records blank.
-    return _render_fallback_file_icon(glyph, hex_color, count)
-
-
-def _render_fallback_file_icon(glyph: str, hex_color: str, count: int) -> QPixmap:
+    # Render at double resolution so high-DPI Windows screens keep clean edges.
     color = QColor(hex_color)
-    pix = QPixmap(150, 100); pix.fill(Qt.transparent)
-    painter = QPainter(pix); painter.setRenderHint(QPainter.Antialiasing)
+    pix = QPixmap(300, 200); pix.setDevicePixelRatio(2); pix.fill(Qt.transparent)
+    painter = QPainter(pix)
+    painter.setRenderHints(QPainter.Antialiasing | QPainter.TextAntialiasing)
+
+    shadow = QColor("#182533"); shadow.setAlpha(37)
     painter.setPen(Qt.NoPen)
-    painter.setBrush(color.lighter(550))
-    painter.drawRoundedRect(QRectF(0, 0, 150, 100), 8, 8)
-    painter.setBrush(QColor("#ffffff"))
-    painter.drawRoundedRect(QRectF(53, 10, 83, 80), 7, 7)
-    painter.setPen(QPen(color.lighter(170), 1.5))
-    if glyph == "X":
-        for y in (27, 40, 53, 66, 79): painter.drawLine(70, y, 124, y)
-        for x in (86, 104): painter.drawLine(x, 26, x, 79)
+    painter.setBrush(shadow)
+    painter.drawRoundedRect(QRectF(44, 12, 78, 80), 17, 17)
+    gradient = QLinearGradient(42, 9, 122, 91)
+    gradient.setColorAt(0, color.lighter(165))
+    gradient.setColorAt(0.48, color.lighter(115))
+    gradient.setColorAt(1, color.darker(140))
+    painter.setBrush(gradient)
+    painter.drawRoundedRect(QRectF(42, 9, 78, 80), 17, 17)
+
+    # The right-hand page gives all formats the same recognizable silhouette.
+    paper = QColor("#ffffff"); paper.setAlpha(218)
+    painter.setBrush(paper)
+    painter.drawRoundedRect(QRectF(68, 23, 40, 49), 5, 5)
+    detail = color.darker(135)
+    detail.setAlpha(190)
+    painter.setPen(QPen(detail, 1.5, Qt.SolidLine, Qt.RoundCap))
+    if name == "excel":
+        for y in (32, 40, 48, 56, 64):
+            painter.drawLine(QPointF(74, y), QPointF(102, y))
+        for x in (74, 83, 93, 102):
+            painter.drawLine(QPointF(x, 32), QPointF(x, 64))
+    elif name == "powerpoint":
+        painter.drawEllipse(QRectF(77, 35, 22, 22))
+        painter.drawLine(QPointF(88, 35), QPointF(88, 46))
+        painter.drawLine(QPointF(88, 46), QPointF(99, 46))
+    elif name == "archive":
+        painter.drawLine(QPointF(88, 29), QPointF(88, 63))
+        for y in (34, 40, 46, 52, 58):
+            painter.drawLine(QPointF(86, y), QPointF(90, y))
+    elif name == "photo":
+        painter.drawEllipse(QRectF(93, 32, 7, 7))
+        painter.drawLine(QPointF(74, 62), QPointF(84, 48))
+        painter.drawLine(QPointF(84, 48), QPointF(91, 55))
+        painter.drawLine(QPointF(91, 55), QPointF(97, 47))
+        painter.drawLine(QPointF(97, 47), QPointF(103, 62))
+        painter.drawLine(QPointF(74, 62), QPointF(103, 62))
     else:
-        for y, end in ((30, 122), (43, 116), (56, 124), (69, 109)):
-            painter.drawLine(69, y, end, y)
-    painter.setPen(Qt.NoPen); painter.setBrush(color)
-    painter.drawRoundedRect(QRectF(15, 15, 64, 70), 8, 8)
+        for y, end in ((33, 101), (41, 98), (49, 102), (57, 94), (65, 99)):
+            painter.drawLine(QPointF(75, y), QPointF(end, y))
+
+    badge_shadow = QColor("#12202d"); badge_shadow.setAlpha(38)
+    painter.setPen(Qt.NoPen)
+    painter.setBrush(badge_shadow)
+    painter.drawRoundedRect(QRectF(35, 52, 47, 35), 10, 10)
+    badge_gradient = QLinearGradient(35, 49, 78, 84)
+    badge_gradient.setColorAt(0, color.darker(104))
+    badge_gradient.setColorAt(1, color.darker(160))
+    painter.setBrush(badge_gradient)
+    painter.drawRoundedRect(QRectF(35, 49, 47, 35), 10, 10)
     painter.setPen(QColor("#ffffff"))
-    font = painter.font(); font.setBold(True); font.setPixelSize(48 if len(glyph) == 1 else 24)
-    painter.setFont(font); painter.drawText(QRectF(15, 15, 64, 70), Qt.AlignCenter, glyph)
+    badge_label = "IMG" if name == "photo" else "FILE" if name == "generic" else glyph
+    font = painter.font(); font.setBold(True)
+    font.setPixelSize(27 if len(badge_label) == 1 else 14 if len(badge_label) == 3 else 11 if len(badge_label) == 4 else 19)
+    painter.setFont(font)
+    painter.drawText(QRectF(35, 49, 47, 35), Qt.AlignCenter, badge_label)
     if count > 1:
-        painter.setPen(Qt.NoPen); painter.setBrush(color.darker(120))
-        painter.drawRoundedRect(QRectF(120, 5, 25, 21), 7, 7)
+        painter.setPen(Qt.NoPen); painter.setBrush(QColor("#425266"))
+        painter.drawRoundedRect(QRectF(117, 5, 28, 22), 8, 8)
         painter.setPen(QColor("#ffffff"))
         font.setPixelSize(12); painter.setFont(font)
-        painter.drawText(QRectF(120, 5, 25, 21), Qt.AlignCenter, str(count))
+        painter.drawText(QRectF(117, 5, 28, 22), Qt.AlignCenter, str(count))
     painter.end()
     return pix
 
