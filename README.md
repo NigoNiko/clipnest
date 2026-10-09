@@ -39,7 +39,7 @@ ClipNest 的底部卡片式浏览体验受到 [Paste](https://pasteapp.io/) 的�
 | PyInstaller | 将 Python 应用打包为 Windows 程序 | [许可说明](https://pyinstaller.org/en/stable/license.html) |
 | Inno Setup | 生成 Windows 安装程序 | [项目与许可信息](https://jrsoftware.org/isinfo.php) |
 
-第三方项目各自保留其版权和许可。本项目的文件预览图标来源与再分发许可仍在核实；完成核实前，请勿将当前安装包或含图标素材的源码作为公开发行版分发。
+第三方项目各自保留其版权和许可。文件预览图标出自 [SeeRgb 的 File icon freebie](https://dribbble.com/shots/6273084-File-icon)，其再分发许可仍在核实，也不属于本项目的 MIT 许可范围；完成核实前，请勿将当前安装包或含图标素材的源码作为公开发行版分发。
 
 ## 从源码构建
 
