@@ -2,7 +2,7 @@
 
 一款适用于 Windows 的本地剪贴板历史工具。复制过的文字、Markdown、链接、代码、颜色、图片和文件，会以卡片形式留在桌面底部；需要时用快捷键调出、搜索并重新粘贴。
 
-> 当前版本：**1.34.2** · Windows x64 · [下载安装包](https://github.com/NigoNiko/clipnest/releases/latest)
+> 当前版本：**1.34.3** · Windows x64 · [下载安装包](https://github.com/NigoNiko/clipnest/releases/latest)
 
 ## 界面预览
 
@@ -43,7 +43,7 @@
 
 ## 安装与使用
 
-1. 从 [Releases](https://github.com/NigoNiko/clipnest/releases/latest) 下载 `ClipNest-1.34.2-Setup-x64.exe`，在 Windows x64 上运行。
+1. 从 [Releases](https://github.com/NigoNiko/clipnest/releases/latest) 下载 `ClipNest-1.34.3-Setup-x64.exe`，在 Windows x64 上运行。
 2. 启动后，ClipNest 驻留在系统托盘。复制内容后，按 `Ctrl + Alt + Q` 呼出卡片栏。
 3. 选择卡片即可再次使用；右键卡片可以编辑、重命名、收藏、复制或删除。
 

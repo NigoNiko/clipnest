@@ -2,11 +2,15 @@
 
 ClipNest's own code is licensed under the [MIT License](LICENSE). The following projects retain their own copyrights and licenses. This document distinguishes libraries shipped with the app from tools used to build its installer.
 
+The Windows installation includes this file, ClipNest's `LICENSE`, and the relevant license texts in `_internal/licenses/`. Open-source Qt shared libraries remain in `_internal/` and can be replaced there. The corresponding upstream source is available through the project links below.
+
 ## Libraries shipped with the app
 
 ### Qt for Python / PySide6 / Qt
 
 Qt for Python provides the application UI and is available under LGPLv3/GPLv3 or a commercial license. ClipNest uses the community distribution. See the [Qt for Python licensing page](https://doc.qt.io/qtforpython-6/) and [third-party licenses in Qt for Python](https://doc.qt.io/qtforpython-6/licenses.html). The application must preserve the user's ability to replace the shared Qt libraries under the applicable LGPL terms.
+
+The complete LGPLv3 and GPLv3 texts are included in `_internal/licenses/`.
 
 ### SQLCipher
 
@@ -44,6 +48,10 @@ The Python [sqlcipher3](https://github.com/coleifer/sqlcipher3) package connects
 ### OpenSSL and SQLite
 
 SQLCipher may include or link to [OpenSSL](https://openssl-library.org/source/license/index.html) and is based on [SQLite](https://sqlite.org/copyright.html). Their own notices and licenses apply to the components present in the selected build.
+
+### Python
+
+The packaged application includes the Python runtime under the [Python Software Foundation License](https://docs.python.org/3/license.html). Its license text is included in `_internal/licenses/`.
 
 ## Build and installer tools
 
