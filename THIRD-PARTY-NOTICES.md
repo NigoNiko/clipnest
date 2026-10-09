@@ -52,5 +52,4 @@ SQLCipher may include or link to [OpenSSL](https://openssl-library.org/source/li
 
 ## Artwork
 
-The file preview artwork in `desktop/assets/file-icons/` is based on [SeeRgb's File icon freebie](https://dribbble.com/shots/6273084-File-icon). Its redistribution rights have not yet been established. It is excluded from ClipNest's MIT license; see [SOURCE.md](desktop/assets/file-icons/SOURCE.md).
-
+The file preview artwork in `desktop/assets/file-icons/` is by **[SeeRgb](https://dribbble.com/SeeRgb)**, based on the original [File icon freebie](https://dribbble.com/shots/6273084-File-icon). SeeRgb granted written permission on October 9, 2026 to use, adapt, modify, and redistribute the icons as part of ClipNest, including in public source repositories, installers, screenshots, and future releases. People who download, fork, or redistribute ClipNest may continue using and adapting the icons as part of the project, including commercially. The icons remain SeeRgb's artwork and are not covered by ClipNest's MIT license; see [SOURCE.md](desktop/assets/file-icons/SOURCE.md).

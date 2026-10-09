@@ -4,9 +4,8 @@ These PNGs were extracted from the rendered Sketch preview inside the user-suppl
 
 - Source artwork: `excel`, `word`, `powerpoint`, `pdf`, `archive`, `photo`, `generic`, `audio`, `video`, and `folder`.
 - Matching addition: `text.png` recolors the source Word document while retaining its original folded corner and line artwork, to cover plain text, Markdown files, and log files.
-- The original ZIP and source pages did not include an explicit license allowing redistribution in an open-source repository or bundled installer. Obtain written permission from SeeRgb or replace the artwork before a public release. Do not treat this artwork as covered by ClipNest's MIT license.
+- On October 9, 2026, SeeRgb granted written permission to use, adapt, modify, and redistribute these icons as part of ClipNest, including in public GitHub repositories, installers, project screenshots, and future releases. People who download, fork, or redistribute ClipNest may continue using and adapting the icons as part of the project, including commercially. Credit **SeeRgb** and link to the [original work](https://dribbble.com/shots/6273084-File-icon). The icons remain SeeRgb's artwork and are not covered by ClipNest's MIT license.
 
 All PNGs are 300 × 360 pixels with transparency. The app scales them for the 150 × 100 pixel preview area and bundles them locally; card display makes no network request.
 
 The source preview has a black artboard. The PNG export removes that background while retaining the rendered fold; its appearance has been checked against the original artboard and on ClipNest's light and dark cards.
-

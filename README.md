@@ -4,6 +4,34 @@
 
 > 当前版本：**1.34.2** · Windows x64 · [下载安装包](https://github.com/NigoNiko/clipnest/releases/latest)
 
+## 界面预览
+
+以下截图使用演示数据制作，不包含真实剪贴记录。
+
+### 默认模式 · 全部历史
+
+文字、Markdown、链接、代码、颜色和文件显示在同一条卡片栏中；顶部可切换收藏板、搜索和按类型筛选。
+
+![默认模式下的全部历史：多种内容预览卡片](docs/screenshots/history-light.png)
+
+### 黑暗模式 · 收藏板
+
+收藏板用不同颜色的圆点区分，常用内容可集中保存；收藏板中的卡片支持拖动排序。
+
+![黑暗模式下的工作常用收藏板](docs/screenshots/favorites-dark.png)
+
+### 搜索与筛选
+
+搜索栏会在窗口内展开，输入关键词后即时筛选历史记录；旁边的类型菜单可只显示文本、Markdown、链接、代码、颜色、图片或文件。
+
+![展开搜索栏并筛选出包含 report 的记录](docs/screenshots/search-light.png)
+
+### 记录与隐私设置
+
+可调整历史保留时间、排除不希望记录的应用，并选择是否自动获取网页标题和图标。设置中的外观页面还可切换默认／黑暗模式和窗口透明度。
+
+![记录与隐私设置页面](docs/screenshots/settings-privacy.png)
+
 ## 主要功能
 
 - **快速找回与粘贴**：默认按 `Ctrl + Alt + Q` 打开卡片栏，支持搜索、类型筛选和键盘选择。可直接粘贴到刚才使用的应用，也可只复制到剪贴板。
@@ -41,11 +69,10 @@ ClipNest 的底部卡片式浏览体验受到 [Paste](https://pasteapp.io/) 的�
 | PyInstaller | 将 Python 应用打包为 Windows 程序 | [许可说明](https://pyinstaller.org/en/stable/license.html) |
 | Inno Setup | 生成 Windows 安装程序 | [项目与许可信息](https://jrsoftware.org/isinfo.php) |
 
-第三方项目各自保留其版权和许可。文件预览图标出自 [SeeRgb 的 File icon freebie](https://dribbble.com/shots/6273084-File-icon)，其再分发许可仍在核实，也不属于本项目的 MIT 许可范围；完成核实前，请勿将当前安装包或含图标素材的源码作为公开发行版分发。
+第三方项目各自保留其版权和许可。文件预览图标由 **[SeeRgb](https://dribbble.com/SeeRgb)** 创作，原作品为 [File icon freebie](https://dribbble.com/shots/6273084-File-icon)。SeeRgb 已书面授权 ClipNest 使用、调整和再分发这组图标，包括在公开源码、安装包、项目截图及后续版本中使用；下载、分叉或再分发 ClipNest 的人也可在项目中继续使用和修改，包括商业用途。图标版权仍归 SeeRgb 所有，**不属于 ClipNest 自有代码的 MIT 许可范围**。详见 [图标来源与授权说明](desktop/assets/file-icons/SOURCE.md)。
 
 ClipNest 自己编写的代码使用 [MIT 许可证](LICENSE)。完整的第三方声明见 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。
 
 ## 从源码构建
 
 构建环境为 Windows x64、Python 3.12、PySide6 6.9.2、PyInstaller 6.16.0、sqlcipher3 0.6.2 和 Inno Setup 7。构建入口为 [`desktop/build-release.ps1`](desktop/build-release.ps1)；各版本源码保存在 `desktop/versions/`。详细说明见 [桌面版使用文档](desktop/README.md)。
-
