@@ -49,7 +49,7 @@
 
 默认安装在 `%LOCALAPPDATA%\Programs\ClipNest`，数据默认保存在 `%LOCALAPPDATA%\ClipNest`。正常覆盖升级会保留数据；交互式卸载时可选择是否删除数据和密钥。需要完整操作说明，请看 [桌面版使用文档](desktop/README.md)。
 
-当前发布的安装包尚未进行代码签名。Windows 可能显示“未知发布者”或 SmartScreen 提示。只从本仓库的 Release 下载，并核对 GitHub 显示的文件 SHA-256；计划在素材许可与发布流程确认后申请可信代码签名。
+当前发布的安装包尚未进行代码签名。Windows 可能显示“未知发布者”或 SmartScreen 提示。只从本仓库的 Release 下载，并核对 GitHub 显示的文件 SHA-256；代码签名方案仍在评估中。
 
 ## 隐私说明
 
