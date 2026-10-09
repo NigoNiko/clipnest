@@ -43,6 +43,8 @@ ClipNest 的底部卡片式浏览体验受到 [Paste](https://pasteapp.io/) 的�
 
 第三方项目各自保留其版权和许可。文件预览图标出自 [SeeRgb 的 File icon freebie](https://dribbble.com/shots/6273084-File-icon)，其再分发许可仍在核实，也不属于本项目的 MIT 许可范围；完成核实前，请勿将当前安装包或含图标素材的源码作为公开发行版分发。
 
+ClipNest 自己编写的代码使用 [MIT 许可证](LICENSE)。完整的第三方声明见 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。
+
 ## 从源码构建
 
 构建环境为 Windows x64、Python 3.12、PySide6 6.9.2、PyInstaller 6.16.0、sqlcipher3 0.6.2 和 Inno Setup 7。构建入口为 [`desktop/build-release.ps1`](desktop/build-release.ps1)；各版本源码保存在 `desktop/versions/`。详细说明见 [桌面版使用文档](desktop/README.md)。
