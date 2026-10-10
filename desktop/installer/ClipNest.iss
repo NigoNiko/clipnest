@@ -38,6 +38,9 @@ Name: "chinesesimplified"; MessagesFile: "compiler:Languages\ChineseSimplified.i
 Name: "desktopicon"; Description: "创建桌面快捷方式"; GroupDescription: "附加任务："; Flags: unchecked
 
 [InstallDelete]
+; Remove credentials left by old private beta builds during the stable upgrade.
+Type: files; Name: "{%LOCALAPPDATA}\ClipNest\github-token.dat"
+Type: files; Name: "{%LOCALAPPDATA}\ClipNest\github-token.tmp"
 ; Remove only identified program files from the old portable bundle.
 Type: filesandordirs; Name: "{app}\ClipNest-1.20-Windows\ClipNest-1.20\_internal"
 Type: files; Name: "{app}\ClipNest-1.20-Windows\ClipNest-1.20\ClipNest.exe"
@@ -119,8 +122,7 @@ begin
     '是否同时删除 ClipNest 的本地剪贴记录和设置？' + #13#10 + #13#10 +
     '是：彻底删除记录、密钥、设置和更新缓存。' + #13#10 +
     '否：保留记录和密钥，以便同一 Windows 账户重装后继续使用。' + #13#10 +
-    '取消：停止卸载。' + #13#10 + #13#10 +
-    '无论选择哪种方式，已保存的 GitHub 访问令牌都会删除。',
+    '取消：停止卸载。',
     mbConfirmation, MB_YESNOCANCEL or MB_DEFBUTTON1);
   RemoveUserData := Choice = IDYES;
   Result := Choice <> IDCANCEL;

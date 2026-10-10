@@ -2,7 +2,7 @@
 
 一款适用于 Windows 的本地剪贴板历史工具。复制过的文字、Markdown、链接、代码、颜色、图片和文件，会以卡片形式留在桌面底部；需要时用快捷键调出、搜索并重新粘贴。
 
-> 当前版本：**1.34.7** · Windows x64 · [下载安装包](https://github.com/NigoNiko/clipnest/releases/latest)
+> 当前正式版：**1.00.0** · Windows x64 · [下载安装包](https://github.com/NigoNiko/clipnest/releases/latest)
 
 ## 界面预览
 
@@ -43,11 +43,13 @@
 
 ## 安装与使用
 
-1. 从 [Releases](https://github.com/NigoNiko/clipnest/releases/latest) 下载 `ClipNest-1.34.7-Setup-x64.exe`，在 Windows x64 上运行。
+1. 从 [Releases](https://github.com/NigoNiko/clipnest/releases/latest) 下载 `ClipNest-1.00.0-Setup-x64.exe`，在 Windows x64 上运行。
 2. 启动后，ClipNest 驻留在系统托盘。复制内容后，按 `Ctrl + Alt + Q` 呼出卡片栏。
 3. 选择卡片即可再次使用；右键卡片可以编辑、重命名、收藏、复制或删除。
 
 默认安装在 `%LOCALAPPDATA%\Programs\ClipNest`，数据默认保存在 `%LOCALAPPDATA%\ClipNest`。正常覆盖升级会保留数据；交互式卸载时可选择是否删除数据和密钥。需要完整操作说明，请看 [桌面版使用文档](desktop/README.md)。
+
+此前的 `1.34.7` 属于 Beta 测试版。该版本按数字比较更新，无法自动识别号码较小的正式版 `1.00.0`；测试版用户请手动下载安装包覆盖安装一次，原有记录和设置会保留。之后正式版可继续在“设置 → 关于”在线更新。
 
 当前发布的安装包尚未进行代码签名。Windows 可能显示“未知发布者”或 SmartScreen 提示。只从本仓库的 Release 下载，并核对 GitHub 显示的文件 SHA-256；代码签名方案仍在评估中。
 
