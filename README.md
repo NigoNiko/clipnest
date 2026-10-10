@@ -1,8 +1,12 @@
 # ClipNest
 
+[简体中文](README.md) · [繁體中文](README.zh-TW.md) · [English](README.en.md)
+
+> **Codex Vibe Coding 项目**：ClipNest 由维护者与 Codex 协作开发，维护者负责需求选择、测试与发布。
+
 一款适用于 Windows 的本地剪贴板历史工具。复制过的文字、Markdown、链接、代码、颜色、图片和文件，会以卡片形式留在桌面底部；需要时用快捷键调出、搜索并重新粘贴。
 
-> 当前正式版：**1.00.0** · Windows x64 · [下载安装包](https://github.com/NigoNiko/clipnest/releases/latest)
+> 当前正式版：**1.00.1** · Windows x64 · [下载安装包](https://github.com/NigoNiko/clipnest/releases/latest)
 
 ## 界面预览
 
@@ -43,7 +47,7 @@
 
 ## 安装与使用
 
-1. 从 [Releases](https://github.com/NigoNiko/clipnest/releases/latest) 下载 `ClipNest-1.00.0-Setup-x64.exe`，在 Windows x64 上运行。
+1. 从 [Releases](https://github.com/NigoNiko/clipnest/releases/latest) 下载 `ClipNest-1.00.1-Setup-x64.exe`，在 Windows x64 上运行。
 2. 启动后，ClipNest 驻留在系统托盘。复制内容后，按 `Ctrl + Alt + Q` 呼出卡片栏。
 3. 选择卡片即可再次使用；右键卡片可以编辑、重命名、收藏、复制或删除。
 
