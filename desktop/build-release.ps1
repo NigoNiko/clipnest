@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet('1.30', '1.31', '1.32', '1.33', '1.34', '1.34.1', '1.34.2', '1.34.3', '1.34.4', '1.34.5')]
+    [ValidateSet('1.30', '1.31', '1.32', '1.33', '1.34', '1.34.1', '1.34.2', '1.34.3', '1.34.4', '1.34.5', '1.34.6')]
     [string] $Version
 )
 
@@ -21,7 +21,7 @@ python -m pip install --disable-pip-version-check @dependencies
 if ($LASTEXITCODE -ne 0) { throw 'Installing Python build dependencies failed.' }
 python -m PyInstaller --noconfirm --distpath $distRoot --workpath (Join-Path $buildRoot 'pyinstaller') (Join-Path $sourceDir 'ClipNest.spec')
 if ($LASTEXITCODE -ne 0) { throw 'PyInstaller failed.' }
-if ($Version -in @('1.34.3', '1.34.4', '1.34.5')) {
+if ($Version -in @('1.34.3', '1.34.4', '1.34.5', '1.34.6')) {
     foreach ($relative in @('_internal\LICENSE', '_internal\THIRD-PARTY-NOTICES.md', '_internal\licenses\LGPL-3.0.txt', '_internal\licenses\GPL-3.0.txt', '_internal\licenses\Apache-2.0.txt')) {
         if (-not (Test-Path (Join-Path $distRoot "ClipNest\$relative"))) { throw "Missing bundled license: $relative" }
     }
