@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet('1.00.0', '1.00.1', '1.30', '1.31', '1.32', '1.33', '1.34', '1.34.1', '1.34.2', '1.34.3', '1.34.4', '1.34.5', '1.34.6', '1.34.7')]
+    [ValidateSet('1.00.1')]
     [string] $Version
 )
 
@@ -21,10 +21,8 @@ python -m pip install --disable-pip-version-check @dependencies
 if ($LASTEXITCODE -ne 0) { throw 'Installing Python build dependencies failed.' }
 python -m PyInstaller --noconfirm --distpath $distRoot --workpath (Join-Path $buildRoot 'pyinstaller') (Join-Path $sourceDir 'ClipNest.spec')
 if ($LASTEXITCODE -ne 0) { throw 'PyInstaller failed.' }
-if ($Version -in @('1.00.0', '1.00.1', '1.34.3', '1.34.4', '1.34.5', '1.34.6', '1.34.7')) {
-    foreach ($relative in @('_internal\LICENSE', '_internal\THIRD-PARTY-NOTICES.md', '_internal\licenses\LGPL-3.0.txt', '_internal\licenses\GPL-3.0.txt', '_internal\licenses\Apache-2.0.txt')) {
-        if (-not (Test-Path (Join-Path $distRoot "ClipNest\$relative"))) { throw "Missing bundled license: $relative" }
-    }
+foreach ($relative in @('_internal\LICENSE', '_internal\THIRD-PARTY-NOTICES.md', '_internal\licenses\LGPL-3.0.txt', '_internal\licenses\GPL-3.0.txt', '_internal\licenses\Apache-2.0.txt')) {
+    if (-not (Test-Path (Join-Path $distRoot "ClipNest\$relative"))) { throw "Missing bundled license: $relative" }
 }
 
 $innoInstaller = Join-Path $buildRoot 'innosetup-7.1.0-x64.exe'
@@ -37,11 +35,11 @@ $inno = Start-Process -FilePath $innoInstaller -ArgumentList @('/SP-', '/VERYSIL
 if ($inno.ExitCode -ne 0) { throw "Inno Setup bootstrap failed: $($inno.ExitCode)" }
 
 $template = Get-Content (Join-Path $desktopRoot 'installer\ClipNest.iss') -Raw
-$template = $template.Replace('#define AppVersion "1.32"', "#define AppVersion `"$Version`"")
-$template = $template.Replace('#define BuildDir "..\..\work\dist-v132\ClipNest"', "#define BuildDir `"$(Join-Path $distRoot 'ClipNest')`"")
+$template = $template.Replace('#define AppVersion "1.00.1"', "#define AppVersion `"$Version`"")
+$template = $template.Replace('#define BuildDir "..\..\build\1.00.1\dist\ClipNest"', "#define BuildDir `"$(Join-Path $distRoot 'ClipNest')`"")
 $versionComponents = @($Version.Split('.'))
 while ($versionComponents.Count -lt 4) { $versionComponents += '0' }
-$template = $template.Replace('VersionInfoVersion=1.32.0.0', "VersionInfoVersion=$($versionComponents[0..3] -join '.')")
+$template = $template.Replace('VersionInfoVersion=1.0.1.0', "VersionInfoVersion=$($versionComponents[0..3] -join '.')")
 $template = $template.Replace('SetupIconFile=ClipNest.ico', "SetupIconFile=$(Join-Path $sourceDir 'ClipNest.ico')")
 $template = $template.Replace('OutputDir=..', "OutputDir=$outputRoot")
 $generatedScript = Join-Path $buildRoot 'ClipNest.iss'

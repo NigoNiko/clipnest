@@ -81,4 +81,4 @@ ClipNest 自己编写的代码使用 [MIT 许可证](LICENSE)。完整的第三�
 
 ## 从源码构建
 
-构建环境为 Windows x64、Python 3.12、PySide6 6.9.2、PyInstaller 6.16.0、sqlcipher3 0.6.2 和 Inno Setup 7。构建入口为 [`desktop/build-release.ps1`](desktop/build-release.ps1)；当前源码及自 1.30 引入窗口透明度后的版本源码保存在 `desktop/versions/`。详细说明见 [桌面版使用文档](desktop/README.md)。
+构建环境为 Windows x64、Python 3.12、PySide6 6.9.2、PyInstaller 6.16.0、sqlcipher3 0.6.2 和 Inno Setup 7。构建入口为 [`desktop/build-release.ps1`](desktop/build-release.ps1)；当前源码位于 `desktop/versions/1.00.1/`。详细说明见 [桌面版使用文档](desktop/README.md)。

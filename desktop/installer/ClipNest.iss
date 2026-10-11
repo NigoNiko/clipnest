@@ -1,6 +1,6 @@
 #define AppName "ClipNest"
-#define AppVersion "1.32"
-#define BuildDir "..\..\work\dist-v132\ClipNest"
+#define AppVersion "1.00.1"
+#define BuildDir "..\..\build\1.00.1\dist\ClipNest"
 
 [Setup]
 AppId={{0ED42FB7-3A2F-43B3-B063-BACD9F672671}
@@ -28,7 +28,7 @@ WizardStyle=modern
 CloseApplications=yes
 RestartApplications=no
 ShowLanguageDialog=no
-VersionInfoVersion=1.32.0.0
+VersionInfoVersion=1.0.1.0
 VersionInfoDescription=ClipNest installer
 
 [Languages]
