@@ -21,11 +21,11 @@ jobs:
       - name: Check source and build installer
         shell: pwsh
         run: |
-          python -m py_compile desktop/versions/1.00.1/clipnest.py desktop/versions/1.00.1/localization.py
-          & ./desktop/build-release.ps1 -Version 1.00.1
-          if ($LASTEXITCODE -ne 0) { throw '1.00.1 build failed.' }
-          $program = 'build/1.00.1/dist/ClipNest/ClipNest.exe'
-          $installer = 'release-output/ClipNest-1.00.1-Setup-x64.exe'
+          python -m py_compile desktop/versions/1.00.2/clipnest.py desktop/versions/1.00.2/localization.py
+          & ./desktop/build-release.ps1 -Version 1.00.2
+          if ($LASTEXITCODE -ne 0) { throw '1.00.2 build failed.' }
+          $program = 'build/1.00.2/dist/ClipNest/ClipNest.exe'
+          $installer = 'release-output/ClipNest-1.00.2-Setup-x64.exe'
           if (-not (Test-Path $program)) { throw "Missing main program: $program" }
           if (-not (Test-Path $installer)) { throw "Missing installer: $installer" }
           if ((Get-Item $program).Length -lt 1MB) { throw 'Main program is unexpectedly small.' }
@@ -34,6 +34,6 @@ jobs:
           Write-Output "Installer SHA256=$((Get-FileHash $installer -Algorithm SHA256).Hash)"
       - uses: actions/upload-artifact@v4
         with:
-          name: ClipNest-1.00.1-package-check
-          path: release-output/ClipNest-1.00.1-Setup-x64.exe
+          name: ClipNest-1.00.2-package-check
+          path: release-output/ClipNest-1.00.2-Setup-x64.exe
           if-no-files-found: error
