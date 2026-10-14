@@ -80,4 +80,4 @@ ClipNest's original code is licensed under [MIT](LICENSE). See [third-party noti
 
 ## Build from source
 
-The Windows x64 build uses Python 3.12, PySide6 6.9.2, PyInstaller 6.16.0, sqlcipher3 0.6.2, and Inno Setup 7. Run [`desktop/build-release.ps1`](desktop/build-release.ps1); the current source is under `desktop/versions/1.00.3/`.
+The Windows x64 build uses Python 3.12, PySide6 6.9.2, PyInstaller 6.16.0, sqlcipher3 0.6.2, and Inno Setup 7. Run [`desktop/build-release.ps1`](desktop/build-release.ps1); the current source is under `desktop/versions/1.00.4/`.
