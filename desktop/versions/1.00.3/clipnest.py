@@ -470,16 +470,24 @@ def link_icon_tile(pixmap: QPixmap, size: int = 34) -> QPixmap:
     bounds = QRectF(0.5, 0.5, size - 1, size - 1)
     shape = QPainterPath()
     shape.addRoundedRect(bounds, 8, 8)
-    surface = QLinearGradient(0, 0, size, size)
-    surface.setColorAt(0, QColor("#549578" if dark_mode() else "#a3d4ba"))
-    surface.setColorAt(1, QColor("#346a56" if dark_mode() else "#7db99c"))
-    painter.fillPath(shape, surface)
+    painter.fillPath(shape, QColor("#ffffff"))
     painter.setClipPath(shape)
     fitted = pixmap.scaled(size, size, Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation)
-    painter.drawPixmap(round((size - fitted.width()) / 2),
-                       round((size - fitted.height()) / 2), fitted)
+    x = round((size - fitted.width()) / 2)
+    y = round((size - fitted.height()) / 2)
+    # A faint silhouette keeps transparent white favicons visible on the white tile.
+    silhouette = QPixmap(fitted.size())
+    silhouette.fill(Qt.transparent)
+    silhouette_painter = QPainter(silhouette)
+    silhouette_painter.drawPixmap(0, 0, fitted)
+    silhouette_painter.setCompositionMode(QPainter.CompositionMode_SourceIn)
+    silhouette_painter.fillRect(silhouette.rect(), QColor(45, 58, 53, 42))
+    silhouette_painter.end()
+    for dx, dy in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+        painter.drawPixmap(x + dx, y + dy, silhouette)
+    painter.drawPixmap(x, y, fitted)
     painter.setClipping(False)
-    painter.setPen(QPen(QColor(255, 255, 255, 100), 1))
+    painter.setPen(QPen(QColor("#e2e8e4"), 1))
     painter.setBrush(Qt.NoBrush)
     painter.drawPath(shape)
     painter.end()
@@ -2185,6 +2193,48 @@ class TypeChip(QLabel):
         painter.end()
 
 
+class FileNameTooltip(QWidget):
+    """Opaque, rounded filename popup that does not inherit the system tooltip skin."""
+
+    def __init__(self, filename: str, parent: QWidget):
+        super().__init__(parent, Qt.ToolTip | Qt.FramelessWindowHint | Qt.NoDropShadowWindowHint)
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setAttribute(Qt.WA_ShowWithoutActivating)
+        self.setAttribute(Qt.WA_TransparentForMouseEvents)
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(12, 9, 12, 9)
+        label = QLabel(filename)
+        label.setTextFormat(Qt.PlainText)
+        label.setWordWrap(True)
+        label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        label.setFixedWidth(min(320, max(150, label.fontMetrics().horizontalAdvance(filename) + 2)))
+        label.setStyleSheet("background:transparent;color:#292936;font-size:12px;")
+        layout.addWidget(label)
+        self.adjustSize()
+
+    def show_near(self, card: QWidget):
+        center = card.mapToGlobal(QPoint(card.width() // 2, 0))
+        screen = QGuiApplication.screenAt(center) or QGuiApplication.primaryScreen()
+        bounds = screen.availableGeometry()
+        x = center.x() - self.width() // 2
+        y = center.y() - self.height() - 8
+        if y < bounds.top() + 6:
+            y = card.mapToGlobal(QPoint(0, card.height() + 8)).y()
+        x = max(bounds.left() + 6, min(x, bounds.right() - self.width() - 6))
+        y = max(bounds.top() + 6, min(y, bounds.bottom() - self.height() - 6))
+        self.move(x, y)
+        self.show()
+        self.raise_()
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setBrush(QColor("#ffffff"))
+        painter.setPen(QPen(QColor("#d9dde2"), 1))
+        painter.drawRoundedRect(QRectF(0.5, 0.5, self.width() - 1, self.height() - 1), 10, 10)
+        painter.end()
+
+
 class Card(QFrame):
     clicked = Signal(int)
     menu_requested = Signal(int, object)
@@ -2200,6 +2250,9 @@ class Card(QFrame):
         self.drag_enabled = False
         self._press_pos = None
         self._dragging = False
+        self._file_name = ""
+        self._file_name_label = None
+        self._file_tooltip = None
         outer = QVBoxLayout(self); outer.setContentsMargins(0, 0, 0, 0); outer.setSpacing(0)
         kind = clip["kind"]
         surface, chip_color = card_palette(kind)
@@ -2262,7 +2315,10 @@ class Card(QFrame):
             filename = Path(path).name if path else tr("文件")
             file_name.setText(file_name.fontMetrics().elidedText(filename, Qt.ElideMiddle, CARD_WIDTH - 34))
             if file_name.text() != filename:
-                file_name.setToolTip(compact_tooltip(filename))
+                self._file_name = filename
+                self._file_name_label = file_name
+                file_name.setToolTip(filename)
+                file_name.installEventFilter(self)
             file_name.setStyleSheet(f"background:transparent;color:{'#f2eee7' if dark_mode() else '#423b35'};")
             file_layout.addWidget(file_name)
             preview = file_box
@@ -2341,6 +2397,22 @@ class Card(QFrame):
         self.setProperty("selected", selected)
         self.outline.set_state(selected=selected)
         if self.outline.isVisible(): self.outline.raise_()
+
+    def eventFilter(self, watched, event):
+        if watched is self._file_name_label:
+            if event.type() == QEvent.ToolTip:
+                if self._file_tooltip is None:
+                    self._file_tooltip = FileNameTooltip(self._file_name, self)
+                self._file_tooltip.show_near(self)
+                return True
+            if event.type() in (QEvent.Leave, QEvent.Hide) and self._file_tooltip is not None:
+                self._file_tooltip.hide()
+        return super().eventFilter(watched, event)
+
+    def hideEvent(self, event):
+        if self._file_tooltip is not None:
+            self._file_tooltip.hide()
+        super().hideEvent(event)
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:

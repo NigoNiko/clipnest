@@ -30,5 +30,18 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "Build $version failed." }
           $asset = "release-output/ClipNest-$version-Setup-x64.exe"
           if (-not (Test-Path $asset)) { throw "Missing asset $asset" }
-          gh release create "v$version" $asset --repo $env:GITHUB_REPOSITORY --title "ClipNest Version $version" --notes-file "desktop/release-notes/$version.md" --latest
-          if ($LASTEXITCODE -ne 0) { throw "Publishing $version failed." }
+          gh release view "v$version" --repo $env:GITHUB_REPOSITORY *> $null
+          if ($LASTEXITCODE -eq 0) {
+            gh release upload "v$version" $asset --clobber --repo $env:GITHUB_REPOSITORY
+            if ($LASTEXITCODE -ne 0) { throw "Replacing the $version installer failed." }
+            gh release edit "v$version" --repo $env:GITHUB_REPOSITORY --title "ClipNest Version $version" --notes-file "desktop/release-notes/$version.md" --latest
+            if ($LASTEXITCODE -ne 0) { throw "Updating the $version release notes failed." }
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git tag -f "v$version" $env:GITHUB_SHA
+            git push --force origin "refs/tags/v$version"
+            if ($LASTEXITCODE -ne 0) { throw "Updating the $version source tag failed." }
+          } else {
+            gh release create "v$version" $asset --repo $env:GITHUB_REPOSITORY --title "ClipNest Version $version" --notes-file "desktop/release-notes/$version.md" --latest --target $env:GITHUB_SHA
+            if ($LASTEXITCODE -ne 0) { throw "Publishing $version failed." }
+          }
