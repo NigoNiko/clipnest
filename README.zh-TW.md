@@ -6,7 +6,7 @@
 
 一款適用於 Windows 的本機剪貼簿歷史工具。複製過的文字、Markdown、連結、程式碼、顏色、圖片和檔案，會以卡片形式留在桌面底部；需要時用快捷鍵叫出、搜尋並重新貼上。
 
-> 目前正式版：**1.00.1** · Windows x64 · [下載安裝程式](https://github.com/NigoNiko/clipnest/releases/latest)
+> 目前正式版：**1.00.5** · Windows x64 · [下載安裝程式](https://github.com/NigoNiko/clipnest/releases/latest)
 
 ## 介面預覽
 
@@ -44,15 +44,17 @@
 - **可控的記錄行為**：可暫停記錄、設定保留時間、忽略指定應用程式，並管理開機啟動。程式預設跳過常見密碼管理器，以及標記為不應儲存的剪貼內容；排除規則無法識別所有敏感資訊。
 - **本機資料保護**：歷史紀錄、圖片、連結預覽和設定儲存在 SQLCipher 加密資料庫中；金鑰由目前 Windows 帳戶的 DPAPI 保護。沒有雲端同步。可在設定中備份和搬移資料。
 - **安裝、更新與解除安裝**：安裝程式支援覆蓋更新；「設定 → 關於」可檢查 GitHub Release。解除安裝時可選擇保留或清除本機資料。
-- **介面語言**：可跟隨系統語言，或在「設定 → 外觀與操作」選擇簡體中文、繁體中文或 English。變更後需重新啟動 ClipNest。
+- **介面語言**：可跟隨系統語言，或在「設定 → 外觀」選擇簡體中文、繁體中文或 English。變更後立即套用。
 
 ## 安裝與使用
 
-1. 從 [Releases](https://github.com/NigoNiko/clipnest/releases/latest) 下載 `ClipNest-1.00.1-Setup-x64.exe`，在 Windows x64 上執行。
+1. 從 [Releases](https://github.com/NigoNiko/clipnest/releases/latest) 下載 `ClipNest-1.00.5-Setup-x64.exe`，在 Windows x64 上執行。
 2. 啟動後，ClipNest 會留在系統匣。複製內容後，按 `Ctrl + Alt + Q` 叫出卡片列。
 3. 選擇卡片即可再次使用；右鍵可編輯、重新命名、收藏、複製或刪除。
 
 預設安裝於 `%LOCALAPPDATA%\Programs\ClipNest`，資料預設儲存於 `%LOCALAPPDATA%\ClipNest`。一般覆蓋更新會保留資料；互動式解除安裝可選擇是否刪除資料和金鑰。更多操作資訊請參閱[桌面版使用文件](desktop/README.md)（目前為簡體中文）。
+
+即時模糊背景需要[微軟 .NET 8 Runtime（x64）](https://dotnet.microsoft.com/download/dotnet/8.0)。若未安裝，ClipNest 會提供下載入口，其他功能仍可使用。
 
 先前的 `1.34.7` 是 Beta 測試版。該版本以數字比較版本號，無法自動識別號碼較小的正式版 `1.00.0`；Beta 使用者需手動下載正式版並覆蓋安裝一次，原有紀錄與設定會保留。之後可繼續在應用程式內更新。
 
@@ -80,4 +82,4 @@ ClipNest 自行編寫的程式碼使用 [MIT 授權](LICENSE)。完整第三方�
 
 ## 從原始碼建置
 
-建置環境為 Windows x64、Python 3.12、PySide6 6.9.2、PyInstaller 6.16.0、sqlcipher3 0.6.2 與 Inno Setup 7。使用 [`desktop/build-release.ps1`](desktop/build-release.ps1) 建置；目前原始碼位於 `desktop/versions/1.00.4/`。
+建置環境為 Windows x64、Python 3.12、.NET 8 SDK、PySide6 6.9.2、PyInstaller 6.16.0、sqlcipher3 0.6.2 與 Inno Setup 7。使用 [`desktop/build-release.ps1`](desktop/build-release.ps1) 建置；目前原始碼位於 `desktop/versions/1.00.5/`。

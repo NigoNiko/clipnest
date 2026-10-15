@@ -1,8 +1,9 @@
 param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet('1.00.0', '1.00.1', '1.00.3', '1.00.4', '1.30', '1.31', '1.32', '1.33', '1.34', '1.34.1', '1.34.2', '1.34.3', '1.34.4', '1.34.5', '1.34.6', '1.34.7')]
+    [ValidateSet('1.00.0', '1.00.1', '1.00.3', '1.00.4', '1.00.5', '1.30', '1.31', '1.32', '1.33', '1.34', '1.34.1', '1.34.2', '1.34.3', '1.34.4', '1.34.5', '1.34.6', '1.34.7')]
     [string] $Version,
     [string] $PythonExe = 'python',
+    [string] $DotnetExe = 'dotnet',
     [switch] $UseInstalledDependencies
 )
 
@@ -18,6 +19,13 @@ New-Item -ItemType Directory -Force $buildRoot, $outputRoot | Out-Null
 $iconBytes = [Convert]::FromBase64String((Get-Content (Join-Path $desktopRoot 'assets\ClipNest.ico.base64') -Raw).Trim())
 [IO.File]::WriteAllBytes((Join-Path $sourceDir 'ClipNest.ico'), $iconBytes)
 
+if ($Version -eq '1.00.5') {
+    & (Join-Path $desktopRoot 'composition-host\build.ps1') -DotnetExe $DotnetExe
+    if (-not (Test-Path (Join-Path $desktopRoot 'composition-host\publish-framework\dotnet-runtime-required.marker'))) {
+        throw 'Missing validated live blur helper.'
+    }
+}
+
 $dependencies = @('PySide6==6.9.2', 'PyInstaller==6.16.0', 'sqlcipher3==0.6.2')
 if (-not $UseInstalledDependencies) {
     & $PythonExe -m pip install --disable-pip-version-check @dependencies
@@ -25,9 +33,14 @@ if (-not $UseInstalledDependencies) {
 }
 & $PythonExe -m PyInstaller --noconfirm --distpath $distRoot --workpath (Join-Path $buildRoot 'pyinstaller') (Join-Path $sourceDir 'ClipNest.spec')
 if ($LASTEXITCODE -ne 0) { throw 'PyInstaller failed.' }
-if ($Version -in @('1.00.0', '1.00.1', '1.00.3', '1.00.4', '1.34.3', '1.34.4', '1.34.5', '1.34.6', '1.34.7')) {
+if ($Version -in @('1.00.0', '1.00.1', '1.00.3', '1.00.4', '1.00.5', '1.34.3', '1.34.4', '1.34.5', '1.34.6', '1.34.7')) {
     foreach ($relative in @('_internal\LICENSE', '_internal\THIRD-PARTY-NOTICES.md', '_internal\licenses\LGPL-3.0.txt', '_internal\licenses\GPL-3.0.txt', '_internal\licenses\Apache-2.0.txt')) {
         if (-not (Test-Path (Join-Path $distRoot "ClipNest\$relative"))) { throw "Missing bundled license: $relative" }
+    }
+}
+if ($Version -eq '1.00.5') {
+    foreach ($relative in @('_internal\composition-host\ClipNest.BlurHost.exe', '_internal\licenses\Avalonia-MIT.txt', '_internal\licenses\SkiaSharp-Native-NOTICES.txt')) {
+        if (-not (Test-Path (Join-Path $distRoot "ClipNest\$relative"))) { throw "Missing live blur component: $relative" }
     }
 }
 

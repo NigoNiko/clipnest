@@ -12,6 +12,10 @@ Qt for Python provides the application UI and is available under LGPLv3/GPLv3 or
 
 The complete LGPLv3 and GPLv3 texts are included in `_internal/licenses/`.
 
+### Avalonia and the live blur helper
+
+The optional live blur helper uses [Avalonia](https://github.com/AvaloniaUI/Avalonia) 12.1.4 under the MIT License. Its license and upstream notices are included in `_internal/licenses/Avalonia-MIT.txt` and `_internal/licenses/Avalonia-NOTICE.md`. The helper also packages ANGLE, SkiaSharp, and HarfBuzzSharp components. Their package licenses and third-party notices are included in `_internal/licenses/` under the `Avalonia-ANGLE-*`, `SkiaSharp-*`, and `HarfBuzzSharp-*` names. The .NET 8 Runtime is not included in the installer; users may install it separately from Microsoft if they want live blur.
+
 ### SQLCipher
 
 SQLCipher provides encrypted database storage. Copyright (c) 2025, ZETETIC LLC. It is used under the following BSD-style license. See the [SQLCipher project](https://github.com/sqlcipher/sqlcipher) and [license information](https://www.zetetic.net/sqlcipher/license/).

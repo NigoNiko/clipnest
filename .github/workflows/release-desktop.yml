@@ -19,13 +19,18 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Build and publish Version 1.00.4
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Build and publish Version 1.00.5
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           $ErrorActionPreference = 'Stop'
-          $version = '1.00.4'
+          $version = '1.00.5'
           & ./desktop/build-release.ps1 -Version $version
           if ($LASTEXITCODE -ne 0) { throw "Build $version failed." }
           $asset = "release-output/ClipNest-$version-Setup-x64.exe"

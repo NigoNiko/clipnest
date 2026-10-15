@@ -6,7 +6,7 @@
 
 A local clipboard history app for Windows. Text, Markdown, links, code, colors, images, and files appear as cards in a shelf at the bottom of your desktop. Open the shelf with a shortcut, find an item, and paste it again.
 
-> Latest stable version: **1.00.1** · Windows x64 · [Download the installer](https://github.com/NigoNiko/clipnest/releases/latest)
+> Latest stable version: **1.00.5** · Windows x64 · [Download the installer](https://github.com/NigoNiko/clipnest/releases/latest)
 
 ## Screenshots
 
@@ -44,15 +44,17 @@ Choose a retention period, exclude apps, and control whether website titles and 
 - **Control what is recorded:** Pause recording, set a retention period, exclude process names, and choose whether ClipNest starts with Windows. Common password managers and clipboard data marked as sensitive are skipped by default; exclusion cannot identify every secret.
 - **Local data protection:** History, images, link previews, and settings are stored in a SQLCipher-encrypted database. Windows DPAPI protects its key for the current Windows account. There is no cloud sync. Backup and migration are available in Settings.
 - **Updates and removal:** Installers upgrade in place. Check GitHub Releases from Settings → About. During interactive uninstall, choose whether to keep or remove local data.
-- **Interface languages:** Follow the system language, or choose Simplified Chinese, Traditional Chinese, or English in Settings → Appearance & behavior. Restart ClipNest to apply the choice.
+- **Interface languages:** Follow the system language, or choose Simplified Chinese, Traditional Chinese, or English in Settings → Appearance. Changes apply immediately.
 
 ## Install and use
 
-1. Download `ClipNest-1.00.1-Setup-x64.exe` from [Releases](https://github.com/NigoNiko/clipnest/releases/latest) and run it on Windows x64.
+1. Download `ClipNest-1.00.5-Setup-x64.exe` from [Releases](https://github.com/NigoNiko/clipnest/releases/latest) and run it on Windows x64.
 2. ClipNest stays in the system tray. Copy something, then press `Ctrl + Alt + Q` to open the shelf.
 3. Select a card to reuse it. Right-click for editing, renaming, favorites, copying, and deletion.
 
 The default installation path is `%LOCALAPPDATA%\Programs\ClipNest`; data is stored in `%LOCALAPPDATA%\ClipNest` by default. In-place updates retain data. Interactive uninstall offers a choice to remove the data and key. The [desktop guide](desktop/README.md) contains more detail (currently in Simplified Chinese).
+
+Live blur requires the [Microsoft .NET 8 Runtime (x64)](https://dotnet.microsoft.com/download/dotnet/8.0). ClipNest offers the download page if it is missing and remains usable without it.
 
 Version `1.34.7` was a Beta. Its numeric version comparison sees stable `1.00.0` as older, so Beta users must install a stable release manually once. Existing history and settings are retained. Future stable updates can be installed from the app.
 
@@ -80,4 +82,4 @@ ClipNest's original code is licensed under [MIT](LICENSE). See [third-party noti
 
 ## Build from source
 
-The Windows x64 build uses Python 3.12, PySide6 6.9.2, PyInstaller 6.16.0, sqlcipher3 0.6.2, and Inno Setup 7. Run [`desktop/build-release.ps1`](desktop/build-release.ps1); the current source is under `desktop/versions/1.00.4/`.
+The Windows x64 build uses Python 3.12, .NET 8 SDK, PySide6 6.9.2, PyInstaller 6.16.0, sqlcipher3 0.6.2, and Inno Setup 7. Run [`desktop/build-release.ps1`](desktop/build-release.ps1); the current source is under `desktop/versions/1.00.5/`.
