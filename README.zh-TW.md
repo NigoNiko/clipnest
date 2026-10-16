@@ -6,7 +6,7 @@
 
 一款適用於 Windows 的本機剪貼簿歷史工具。複製過的文字、Markdown、連結、程式碼、顏色、圖片和檔案，會以卡片形式留在桌面底部；需要時用快捷鍵叫出、搜尋並重新貼上。
 
-> 目前正式版：**1.00.5** · Windows x64 · [下載安裝程式](https://github.com/NigoNiko/clipnest/releases/latest)
+> 目前正式版：**1.00.6** · Windows x64 · [下載安裝程式](https://github.com/NigoNiko/clipnest/releases/latest)
 
 ## 介面預覽
 
@@ -48,7 +48,7 @@
 
 ## 安裝與使用
 
-1. 從 [Releases](https://github.com/NigoNiko/clipnest/releases/latest) 下載 `ClipNest-1.00.5-Setup-x64.exe`，在 Windows x64 上執行。
+1. 從 [Releases](https://github.com/NigoNiko/clipnest/releases/latest) 下載 `ClipNest-1.00.6-Setup-x64.exe`，在 Windows x64 上執行。
 2. 啟動後，ClipNest 會留在系統匣。複製內容後，按 `Ctrl + Alt + Q` 叫出卡片列。
 3. 選擇卡片即可再次使用；右鍵可編輯、重新命名、收藏、複製或刪除。
 
@@ -71,6 +71,7 @@ ClipNest 底部卡片式的瀏覽體驗受到 [Paste](https://pasteapp.io/) 啟�
 | 專案 | 用途 | 授權與專案連結 |
 | --- | --- | --- |
 | Qt for Python / PySide6 | 桌面介面 | [LGPLv3/GPLv3 或商業授權](https://doc.qt.io/qtforpython-6/) |
+| Avalonia | Windows 即時模糊背景的輔助視窗與系統合成 | [MIT 授權與專案原始碼](https://github.com/AvaloniaUI/Avalonia) |
 | SQLCipher | 加密資料庫 | [BSD 風格授權與版權聲明](https://www.zetetic.net/sqlcipher/license/) |
 | sqlcipher3 | Python 與 SQLCipher 的連接 | [PyPI](https://pypi.org/project/sqlcipher3/) |
 | PyInstaller | 封裝 Windows 程式 | [授權說明](https://pyinstaller.org/en/stable/license.html) |
@@ -82,4 +83,4 @@ ClipNest 自行編寫的程式碼使用 [MIT 授權](LICENSE)。完整第三方�
 
 ## 從原始碼建置
 
-建置環境為 Windows x64、Python 3.12、.NET 8 SDK、PySide6 6.9.2、PyInstaller 6.16.0、sqlcipher3 0.6.2 與 Inno Setup 7。使用 [`desktop/build-release.ps1`](desktop/build-release.ps1) 建置；目前原始碼位於 `desktop/versions/1.00.5/`。
+建置環境為 Windows x64、Python 3.12、.NET 8 SDK、PySide6 6.9.2、PyInstaller 6.16.0、sqlcipher3 0.6.2 與 Inno Setup 7。使用 [`desktop/build-release.ps1`](desktop/build-release.ps1) 建置；目前原始碼位於 `desktop/versions/1.00.6/`。

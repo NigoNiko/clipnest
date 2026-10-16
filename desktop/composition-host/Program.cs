@@ -30,7 +30,11 @@ internal static class Program
             .UsePlatformDetect()
             .With(new Win32PlatformOptions
             {
+                // Try ANGLE first, then Avalonia's software renderer. This does not
+                // select a discrete/integrated adapter or prove hardware GPU use.
                 RenderingMode = [Win32RenderingMode.AngleEgl, Win32RenderingMode.Software],
+                // Prefer native composition for live Acrylic; the fallback surface
+                // may start successfully without providing Acrylic transparency.
                 CompositionMode = [Win32CompositionMode.WinUIComposition, Win32CompositionMode.RedirectionSurface],
                 // The host sits two physical pixels inside the Qt window.
                 WinUICompositionBackdropCornerRadius = 20f,
@@ -78,6 +82,7 @@ internal sealed class BlurHostApp : Application
             window.Opened += async (_, _) =>
             {
                 await Task.Delay(350);
+                // Report the observed transparency effect, not the renderer or GPU.
                 Dispatcher.UIThread.Post(() => ReportStatus(
                     window.ActualTransparencyLevel == WindowTransparencyLevel.AcrylicBlur
                         ? "acrylic" : "fallback"));

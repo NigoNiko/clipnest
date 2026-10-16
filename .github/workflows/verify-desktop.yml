@@ -24,12 +24,12 @@ jobs:
       - name: Check source and build installer
         shell: pwsh
         run: |
-          python -m py_compile desktop/versions/1.00.5/clipnest.py desktop/versions/1.00.5/localization.py desktop/versions/1.00.5/live_blur.py
-          & ./desktop/build-release.ps1 -Version 1.00.5
-          if ($LASTEXITCODE -ne 0) { throw '1.00.5 build failed.' }
-          $program = 'build/1.00.5/dist/ClipNest/ClipNest.exe'
-          $installer = 'release-output/ClipNest-1.00.5-Setup-x64.exe'
-          $blurHost = 'build/1.00.5/dist/ClipNest/_internal/composition-host/ClipNest.BlurHost.exe'
+          python -m py_compile desktop/versions/1.00.6/clipnest.py desktop/versions/1.00.6/localization.py desktop/versions/1.00.6/live_blur.py
+          & ./desktop/build-release.ps1 -Version 1.00.6
+          if ($LASTEXITCODE -ne 0) { throw '1.00.6 build failed.' }
+          $program = 'build/1.00.6/dist/ClipNest/ClipNest.exe'
+          $installer = 'release-output/ClipNest-1.00.6-Setup-x64.exe'
+          $blurHost = 'build/1.00.6/dist/ClipNest/_internal/composition-host/ClipNest.BlurHost.exe'
           if (-not (Test-Path $program)) { throw "Missing main program: $program" }
           if (-not (Test-Path $installer)) { throw "Missing installer: $installer" }
           if (-not (Test-Path $blurHost)) { throw "Missing live blur host: $blurHost" }
@@ -39,6 +39,6 @@ jobs:
           Write-Output "Installer SHA256=$((Get-FileHash $installer -Algorithm SHA256).Hash)"
       - uses: actions/upload-artifact@v4
         with:
-          name: ClipNest-1.00.5-package-check
-          path: release-output/ClipNest-1.00.5-Setup-x64.exe
+          name: ClipNest-1.00.6-package-check
+          path: release-output/ClipNest-1.00.6-Setup-x64.exe
           if-no-files-found: error

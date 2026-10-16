@@ -6,7 +6,7 @@
 
 A local clipboard history app for Windows. Text, Markdown, links, code, colors, images, and files appear as cards in a shelf at the bottom of your desktop. Open the shelf with a shortcut, find an item, and paste it again.
 
-> Latest stable version: **1.00.5** · Windows x64 · [Download the installer](https://github.com/NigoNiko/clipnest/releases/latest)
+> Latest stable version: **1.00.6** · Windows x64 · [Download the installer](https://github.com/NigoNiko/clipnest/releases/latest)
 
 ## Screenshots
 
@@ -48,7 +48,7 @@ Choose a retention period, exclude apps, and control whether website titles and 
 
 ## Install and use
 
-1. Download `ClipNest-1.00.5-Setup-x64.exe` from [Releases](https://github.com/NigoNiko/clipnest/releases/latest) and run it on Windows x64.
+1. Download `ClipNest-1.00.6-Setup-x64.exe` from [Releases](https://github.com/NigoNiko/clipnest/releases/latest) and run it on Windows x64.
 2. ClipNest stays in the system tray. Copy something, then press `Ctrl + Alt + Q` to open the shelf.
 3. Select a card to reuse it. Right-click for editing, renaming, favorites, copying, and deletion.
 
@@ -71,6 +71,7 @@ The bottom-card browsing experience was inspired by [Paste](https://pasteapp.io/
 | Project | Use | License and project |
 | --- | --- | --- |
 | Qt for Python / PySide6 | Desktop interface | [LGPLv3/GPLv3 or commercial](https://doc.qt.io/qtforpython-6/) |
+| Avalonia | Windows live-blur helper and system composition | [MIT license and source](https://github.com/AvaloniaUI/Avalonia) |
 | SQLCipher | Encrypted database | [BSD-style license and notices](https://www.zetetic.net/sqlcipher/license/) |
 | sqlcipher3 | Python SQLCipher binding | [PyPI](https://pypi.org/project/sqlcipher3/) |
 | PyInstaller | Windows packaging | [License](https://pyinstaller.org/en/stable/license.html) |
@@ -82,4 +83,4 @@ ClipNest's original code is licensed under [MIT](LICENSE). See [third-party noti
 
 ## Build from source
 
-The Windows x64 build uses Python 3.12, .NET 8 SDK, PySide6 6.9.2, PyInstaller 6.16.0, sqlcipher3 0.6.2, and Inno Setup 7. Run [`desktop/build-release.ps1`](desktop/build-release.ps1); the current source is under `desktop/versions/1.00.5/`.
+The Windows x64 build uses Python 3.12, .NET 8 SDK, PySide6 6.9.2, PyInstaller 6.16.0, sqlcipher3 0.6.2, and Inno Setup 7. Run [`desktop/build-release.ps1`](desktop/build-release.ps1); the current source is under `desktop/versions/1.00.6/`.
