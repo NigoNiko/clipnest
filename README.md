@@ -6,7 +6,7 @@
 
 一款适用于 Windows 的本地剪贴板历史工具。复制过的文字、Markdown、链接、代码、颜色、图片和文件，会以卡片形式留在桌面底部；需要时用快捷键调出、搜索并重新粘贴。
 
-> 当前正式版：**1.00.6** · Windows x64 · [下载安装包](https://github.com/NigoNiko/clipnest/releases/latest)
+> 当前正式版：**1.00.7** · Windows x64 · [下载安装包](https://github.com/NigoNiko/clipnest/releases/latest)
 
 ## 界面预览
 
@@ -47,7 +47,7 @@
 
 ## 安装与使用
 
-1. 从 [Releases](https://github.com/NigoNiko/clipnest/releases/latest) 下载 `ClipNest-1.00.6-Setup-x64.exe`，在 Windows x64 上运行。
+1. 从 [Releases](https://github.com/NigoNiko/clipnest/releases/latest) 下载 `ClipNest-1.00.7-Setup-x64.exe`，在 Windows x64 上运行。
 2. 启动后，ClipNest 驻留在系统托盘。复制内容后，按 `Ctrl + Alt + Q` 呼出卡片栏。
 3. 选择卡片即可再次使用；右键卡片可以编辑、重命名、收藏、复制或删除。
 
@@ -84,4 +84,4 @@ ClipNest 自己编写的代码使用 [MIT 许可证](LICENSE)。完整的第三�
 
 ## 从源码构建
 
-构建环境为 Windows x64、Python 3.12、.NET 8 SDK、PySide6 6.9.2、PyInstaller 6.16.0、sqlcipher3 0.6.2 和 Inno Setup 7。构建入口为 [`desktop/build-release.ps1`](desktop/build-release.ps1)；当前源码位于 `desktop/versions/1.00.6/`。详细说明见 [桌面版使用文档](desktop/README.md)。
+构建环境为 Windows x64、Python 3.12、.NET 8 SDK、PySide6 6.9.2、PyInstaller 6.16.0、sqlcipher3 0.6.2 和 Inno Setup 7。构建入口为 [`desktop/build-release.ps1`](desktop/build-release.ps1)；当前源码位于 `desktop/versions/1.00.7/`。详细说明见 [桌面版使用文档](desktop/README.md)。

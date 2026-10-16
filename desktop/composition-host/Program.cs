@@ -14,6 +14,7 @@ internal static class Program
 {
     internal static string WindowTitle { get; private set; } = "ClipNest blur host";
     internal static string? StatusPath { get; private set; }
+    internal static int CornerRadius { get; private set; } = 26;
 
     [STAThread]
     private static void Main(string[] args)
@@ -24,6 +25,9 @@ internal static class Program
                 WindowTitle = arg[8..];
             if (arg.StartsWith("--status=", StringComparison.Ordinal))
                 StatusPath = arg[9..];
+            if (arg.StartsWith("--radius=", StringComparison.Ordinal) &&
+                int.TryParse(arg[9..], out var radius) && radius is >= 1 and <= 256)
+                CornerRadius = radius;
         }
 
         AppBuilder.Configure<BlurHostApp>()
@@ -36,8 +40,8 @@ internal static class Program
                 // Prefer native composition for live Acrylic; the fallback surface
                 // may start successfully without providing Acrylic transparency.
                 CompositionMode = [Win32CompositionMode.WinUIComposition, Win32CompositionMode.RedirectionSurface],
-                // The host sits two physical pixels inside the Qt window.
-                WinUICompositionBackdropCornerRadius = 20f,
+                // The Python host passes a physical-pixel radius for its Qt screen.
+                WinUICompositionBackdropCornerRadius = CornerRadius,
             })
             .StartWithClassicDesktopLifetime(args);
     }

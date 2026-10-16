@@ -6,7 +6,7 @@
 
 一款適用於 Windows 的本機剪貼簿歷史工具。複製過的文字、Markdown、連結、程式碼、顏色、圖片和檔案，會以卡片形式留在桌面底部；需要時用快捷鍵叫出、搜尋並重新貼上。
 
-> 目前正式版：**1.00.6** · Windows x64 · [下載安裝程式](https://github.com/NigoNiko/clipnest/releases/latest)
+> 目前正式版：**1.00.7** · Windows x64 · [下載安裝程式](https://github.com/NigoNiko/clipnest/releases/latest)
 
 ## 介面預覽
 
@@ -48,7 +48,7 @@
 
 ## 安裝與使用
 
-1. 從 [Releases](https://github.com/NigoNiko/clipnest/releases/latest) 下載 `ClipNest-1.00.6-Setup-x64.exe`，在 Windows x64 上執行。
+1. 從 [Releases](https://github.com/NigoNiko/clipnest/releases/latest) 下載 `ClipNest-1.00.7-Setup-x64.exe`，在 Windows x64 上執行。
 2. 啟動後，ClipNest 會留在系統匣。複製內容後，按 `Ctrl + Alt + Q` 叫出卡片列。
 3. 選擇卡片即可再次使用；右鍵可編輯、重新命名、收藏、複製或刪除。
 
@@ -83,4 +83,4 @@ ClipNest 自行編寫的程式碼使用 [MIT 授權](LICENSE)。完整第三方�
 
 ## 從原始碼建置
 
-建置環境為 Windows x64、Python 3.12、.NET 8 SDK、PySide6 6.9.2、PyInstaller 6.16.0、sqlcipher3 0.6.2 與 Inno Setup 7。使用 [`desktop/build-release.ps1`](desktop/build-release.ps1) 建置；目前原始碼位於 `desktop/versions/1.00.6/`。
+建置環境為 Windows x64、Python 3.12、.NET 8 SDK、PySide6 6.9.2、PyInstaller 6.16.0、sqlcipher3 0.6.2 與 Inno Setup 7。使用 [`desktop/build-release.ps1`](desktop/build-release.ps1) 建置；目前原始碼位於 `desktop/versions/1.00.7/`。
